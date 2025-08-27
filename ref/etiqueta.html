@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impressão de Etiquetas - UMADEPAR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos gerais e reset */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #fff; /* Fundo branco, sem cor de visualização */
+        }
+
+        /* Cores baseadas na sua tabela (simulando classes do Tailwind) */
+        .bg-blue-500 { background-color: #3B82F6; }
+        .bg-green-500 { background-color: #10B981; }
+        .bg-yellow-500 { background-color: #EAB308; }
+        .bg-orange-500 { background-color: #F97316; }
+        .bg-red-500 { background-color: #EF4444; }
+        .bg-purple-500 { background-color: #A855F7; }
+        .bg-pink-500 { background-color: #EC4899; }
+        .bg-indigo-500 { background-color: #6366F1; }
+
+        /* Estilização da folha A4 para visualização na tela */
+        .a4-sheet {
+            width: 210mm;
+            height: 297mm; /* Altura fixa para A4 */
+            margin: 0; /* REMOVIDA margem */
+            background: white;
+            box-shadow: none; /* REMOVIDA sombra */
+            box-sizing: border-box;
+            /* Padding de 16px para simular a borda da folha de adesivo */
+            padding: 16px; 
+        }
+
+        /* Grid que contém todas as etiquetas */
+        .labels-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(11, 1fr);
+            height: calc(297mm - 32px); /* Altura total menos o padding */
+            width: calc(210mm - 32px);  /* Largura total menos o padding */
+            gap: 0; 
+        }
+
+        /* Estilo individual de cada etiqueta */
+        .label {
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+            border: 0.5px solid #f0f2f5; 
+        }
+
+        .color-bar {
+            width: 10px; 
+            flex-shrink: 0;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 5px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1px;
+            width: calc(100% - 42px); 
+        }
+
+        .participant-name {
+            font-size: 14px; 
+            font-weight: 800;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #d1d5db;
+            width: 100%;
+            margin: 1px 0;
+        }
+
+        .details {
+            font-size: 9px; 
+            color: #374151;
+            line-height: 1.3;
+        }
+        .details strong {
+            font-weight: 700;
+        }
+
+        .size-badge {
+            width: 37px; 
+            height: 37px; 
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 16px; 
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        
+        /* Estilos para impressão */
+        @media print {
+            .a4-sheet {
+                padding: 16px; /* Garante o padding na impressão */
+            }
+            .label {
+                border: none; /* Remove a borda de visualização na impressão */
+            }
+        }
+        
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="a4-sheet">
+        <div class="labels-grid" id="labels-grid">
+            <!-- As etiquetas serão inseridas aqui via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // --- EDITE AQUI OS DADOS DOS PARTICIPANTES ---
+        const participantes = [
+            { nome: "João Victor da Silva", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Maria Souza", tamanho: "P" },
+            { nome: "Ana Carolina Pereira", igreja: "AD Madureira", cidade: "Cruzeiro do Oeste - PR", comprador: "Ela Mesma", tamanho: "M" },
+            { nome: "Lucas Martins Oliveira", igreja: "AD Belém", cidade: "Umuarama - PR", comprador: "Pedro Costa", tamanho: "G" },
+            { nome: "Mariana Ferreira Lima", igreja: "AD Missão", cidade: "Cianorte - PR", comprador: "Ela Mesma", tamanho: "P" },
+            { nome: "Gabriel Rodrigues Alves", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "José Almeida", tamanho: "GG" },
+            { nome: "Beatriz Gonçalves Costa", igreja: "AD Renovada", cidade: "Goioerê - PR", comprador: "Ela Mesma", tamanho: "XG" },
+            { nome: "Pedro Henrique Santos", igreja: "AD Belém", cidade: "Umuarama - PR", comprador: "Carlos Lima", tamanho: "M" },
+            { nome: "Larissa de Almeida", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ela Mesma", tamanho: "XXG" },
+            { nome: "Matheus Fernandes", igreja: "AD Missão", cidade: "Cianorte - PR", comprador: "Ana Oliveira", tamanho: "E1" },
+            { nome: "Júlia Ribeiro", igreja: "AD Madureira", cidade: "Cruzeiro do Oeste - PR", comprador: "Ela Mesma", tamanho: "E2" },
+            { nome: "Rafael de Souza", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ele Mesmo", tamanho: "G" },
+            { nome: "Isabela Cardoso", igreja: "AD Belém", cidade: "Umuarama - PR", comprador: "Ela Mesma", tamanho: "P" },
+            { nome: "Felipe Nogueira", igreja: "AD Renovada", cidade: "Goioerê - PR", comprador: "Marta Rocha", tamanho: "M" },
+            { nome: "Manuela Azevedo", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ela Mesma", tamanho: "G" },
+            { nome: "Enzo Barbosa", igreja: "AD Missão", cidade: "Cianorte - PR", comprador: "Ele Mesmo", tamanho: "GG" },
+            { nome: "Valentina Monteiro", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ela Mesma", tamanho: "P" },
+            { nome: "Davi Cunha", igreja: "AD Belém", cidade: "Umuarama - PR", comprador: "Ele Mesmo", tamanho: "XG" },
+            { nome: "Helena Castro", igreja: "AD Madureira", cidade: "Cruzeiro do Oeste - PR", comprador: "Ela Mesma", tamanho: "M" },
+            { nome: "Bernardo Pinto", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ele Mesmo", tamanho: "G" },
+            { nome: "Laura Dias", igreja: "AD Renovada", cidade: "Goioerê - PR", comprador: "Ela Mesma", tamanho: "P" },
+            { nome: "Heitor Freitas", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ele Mesmo", tamanho: "XXG" },
+            { nome: "Maria Clara Correia", igreja: "AD Missão", cidade: "Cianorte - PR", comprador: "Ela Mesma", tamanho: "E1" },
+            { nome: "Arthur Teixeira", igreja: "AD Belém", cidade: "Umuarama - PR", comprador: "Ele Mesmo", tamanho: "E2" },
+            { nome: "Alice Mendes", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ela Mesma", tamanho: "P" },
+            { nome: "Miguel Sales", igreja: "AD Madureira", cidade: "Cruzeiro do Oeste - PR", comprador: "Ele Mesmo", tamanho: "M" },
+            { nome: "Sophia Gomes", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ela Mesma", tamanho: "G" },
+            { nome: "Davi Luiz Moraes", igreja: "AD Belém", cidade: "Umuarama - PR", comprador: "Ele Mesmo", tamanho: "GG" },
+            { nome: "Cecília Rocha", igreja: "AD Missão", cidade: "Cianorte - PR", comprador: "Ela Mesma", tamanho: "P" },
+            { nome: "Gael Fogaça", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ele Mesmo", tamanho: "XG" },
+            { nome: "Isis Viana", igreja: "AD Renovada", cidade: "Goioerê - PR", comprador: "Ela Mesma", tamanho: "M" },
+            { nome: "Theo Caldeira", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ele Mesmo", tamanho: "G" },
+            { nome: "Liz Pires", igreja: "AD Belém", cidade: "Umuarama - PR", comprador: "Ela Mesma", tamanho: "P" },
+            { nome: "Ravi Campos", igreja: "AD Central", cidade: "Tapejara - PR", comprador: "Ele Mesmo", tamanho: "GG" }
+        ];
+
+        const colorMap = {
+            'P': 'bg-blue-500', 'M': 'bg-green-500', 'G': 'bg-yellow-500',
+            'GG': 'bg-orange-500', 'XG': 'bg-red-500', 'XXG': 'bg-purple-500',
+            'E1': 'bg-pink-500', 'E2': 'bg-indigo-500', 'default': 'bg-gray-400'
+        };
+
+        function generateLabels() {
+            const grid = document.getElementById('labels-grid');
+            const totalLabels = 33;
+            let contentHTML = '';
+
+            for (let i = 0; i < totalLabels; i++) {
+                const participante = participantes[i];
+                if (participante) {
+                    const colorClass = colorMap[participante.tamanho] || colorMap['default'];
+                    contentHTML += `
+                        <div class="label">
+                            <div class="color-bar ${colorClass}"></div>
+                            <div class="content">
+                                <div class="info">
+                                    <div class="participant-name">${participante.nome}</div>
+                                    <div class="divider"></div>
+                                    <div class="details">
+                                        <strong>Igreja:</strong> ${participante.igreja}<br>
+                                        <strong>Cidade:</strong> ${participante.cidade}<br>
+                                        <strong>Comprador:</strong> ${participante.comprador}
+                                    </div>
+                                </div>
+                                <div class="size-badge ${colorClass}">
+                                    ${participante.tamanho}
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    contentHTML += `<div class="label"></div>`;
+                }
+            }
+            grid.innerHTML = contentHTML;
+        }
+
+        window.onload = generateLabels;
+    </script>
+</body>
+</html>

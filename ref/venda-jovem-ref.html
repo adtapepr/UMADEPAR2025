@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Venda - UMADEPAR 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Swiper.js para o carrossel -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f2b45;
+            color: #d9d9d9;
+        }
+        .bg-dark-blue { background-color: #0f2b45; }
+        .bg-light-gray { background-color: #d9d9d9; }
+        .bg-gold { background-color: #edbe66; }
+        .text-dark-blue { color: #0f2b45; }
+        .text-light-gray { color: #d9d9d9; }
+        .text-gold { color: #edbe66; }
+        .border-gold { border-color: #edbe66; }
+        .ring-gold { --tw-ring-color: #edbe66; }
+        .btn-primary {
+            background-color: #edbe66;
+            color: #0f2b45;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(237, 190, 102, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(237, 190, 102, 0.4);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #edbe66;
+            border: 2px solid #edbe66;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #edbe66;
+            color: #0f2b45;
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        /* Estilos para botões de tamanho */
+        .size-btn {
+            border: 2px solid #ccc;
+            transition: all 0.2s ease;
+        }
+        .size-btn.active {
+            border-color: #0f2b45;
+            background-color: #0f2b45;
+            color: #fff;
+            font-weight: bold;
+        }
+        /* Estilos do Swiper */
+        .product-carousel {
+            aspect-ratio: 1 / 1; /* Garante que o carrossel seja quadrado */
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #edbe66;
+        }
+        .swiper-pagination-bullet-active {
+            background: #edbe66;
+        }
+    </style>
+</head>
+<body class="antialiased bg-light-gray">
+
+    <!-- Cabeçalho e Navegação -->
+    <header id="header" class="bg-dark-blue/80 backdrop-blur-lg sticky top-0 left-0 right-0 z-40 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-gold">UMADEPAR 2025</a>
+            <div class="flex items-center">
+                <nav class="hidden md:flex space-x-8 items-center mr-8">
+                    <a href="index.html" class="btn-secondary font-bold py-2 px-6 rounded-full">Voltar</a>
+                </nav>
+                <a href="#" title="Área do Usuário" class="hidden md:flex items-center justify-center w-10 h-10 border-2 border-gold rounded-full text-gold hover:bg-gold hover:text-dark-blue transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
+                </a>
+                <button id="mobile-menu-button" class="md:hidden text-light-gray focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="index.html" class="block mt-4 w-full text-center btn-secondary font-bold py-2 px-6 rounded-full">Voltar</a>
+             <a href="#" class="block mt-4 w-full text-center border-2 border-gold text-gold font-bold py-2 px-6 rounded-full">Área do Usuário</a>
+        </div>
+    </header>
+
+    <main class="text-dark-blue">
+        <section id="venda" class="py-12 md:py-20">
+            <div class="container mx-auto px-6">
+                <div class="bg-white p-6 md:p-10 rounded-2xl shadow-2xl grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+                    <!-- Coluna da Esquerda: Carrossel de Imagens -->
+                    <div class="w-full" data-aos="fade-right">
+                        <div class="swiper product-carousel rounded-lg overflow-hidden">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide"><img src="https://placehold.co/600x600/0f2b45/ffffff?text=Frente" alt="Produto - Frente" class="w-full h-full object-cover"></div>
+                                <div class="swiper-slide"><img src="https://placehold.co/600x600/0f2b45/ffffff?text=Costas" alt="Produto - Costas" class="w-full h-full object-cover"></div>
+                                <div class="swiper-slide"><img src="https://placehold.co/600x600/edbe66/0f2b45?text=Detalhe" alt="Produto - Detalhe" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna da Direita: Detalhes e Compra -->
+                    <div class="flex flex-col h-full" data-aos="fade-left">
+                        <h1 class="text-3xl lg:text-4xl font-bold mb-3">Camiseta Oficial UMADEPAR 2025</h1>
+                        <p class="text-3xl font-bold text-gold mb-4">R$ 79,90</p>
+                        <p class="mb-6 text-gray-600">Malha de alta qualidade, não encolhe e não desbota. Estoque limitado!</p>
+                        
+                        <div class="mt-auto">
+                            <!-- Seleção de Tamanho -->
+                            <div class="mb-6">
+                                <label class="block font-bold mb-3 text-lg">Tamanho:</label>
+                                <div id="size-selector" class="flex flex-wrap gap-3">
+                                    <button class="size-btn p-3 px-5 rounded-lg font-semibold" data-size="P">P</button>
+                                    <button class="size-btn p-3 px-5 rounded-lg font-semibold" data-size="M">M</button>
+                                    <button class="size-btn p-3 px-5 rounded-lg font-semibold" data-size="G">G</button>
+                                    <button class="size-btn p-3 px-5 rounded-lg font-semibold" data-size="GG">GG</button>
+                                    <button class="size-btn p-3 px-5 rounded-lg font-semibold" data-size="XG">XG</button>
+                                </div>
+                                <a href="#" id="size-guide-link" class="text-sm text-gray-600 hover:text-dark-blue underline mt-3 inline-flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    Guia de tamanhos
+                                </a>
+                            </div>
+                            
+                            <!-- Seleção de Quantidade -->
+                            <div class="mb-8">
+                                <label for="quantity" class="block font-bold mb-3 text-lg">Quantidade:</label>
+                                <div class="flex items-center">
+                                    <button id="qty-minus" class="border-2 rounded-md p-2 px-4 font-bold text-xl">-</button>
+                                    <input type="number" id="quantity" value="1" min="1" class="w-20 text-center text-lg font-bold border-t-2 border-b-2 h-full">
+                                    <button id="qty-plus" class="border-2 rounded-md p-2 px-4 font-bold text-xl">+</button>
+                                </div>
+                            </div>
+    
+                            <!-- Botão de Compra -->
+                            <button id="buy-button" class="btn-primary w-full font-bold py-4 px-10 rounded-full text-lg">
+                                Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-dark-blue border-t border-gold/20 py-12">
+        <div class="container mx-auto px-6 text-center text-light-gray">
+            <p class="font-bold text-xl mb-2 text-gold">UMADEPAR 2025</p>
+            <p>&copy; 2025 União da Mocidade da Assembleia de Deus no Estado do Paraná. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Guia de Tamanhos -->
+    <div id="sizeGuideModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white text-dark-blue p-8 rounded-2xl shadow-2xl w-full max-w-lg relative" data-aos="zoom-in">
+            <button onclick="closeSizeGuideModal()" class="absolute top-4 right-4 text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
+            <h4 class="text-2xl font-bold mb-6 text-center">Guia de Tamanhos</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="p-2 font-bold">Tamanho</th>
+                            <th class="p-2 font-bold">Largura (cm)</th>
+                            <th class="p-2 font-bold">Altura (cm)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b"><td class="p-2">P</td><td class="p-2">50</td><td class="p-2">68</td></tr>
+                        <tr class="border-b"><td class="p-2">M</td><td class="p-2">52</td><td class="p-2">70</td></tr>
+                        <tr class="border-b"><td class="p-2">G</td><td class="p-2">54</td><td class="p-2">72</td></tr>
+                        <tr class="border-b"><td class="p-2">GG</td><td class="p-2">56</td><td class="p-2">74</td></tr>
+                        <tr><td class="p-2">XG</td><td class="p-2">58</td><td class="p-2">76</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">*Medidas aproximadas. Pode haver variação de até 2cm.</p>
+        </div>
+    </div>
+
+    <!-- Modal de Pagamento -->
+    <div id="paymentModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white text-dark-blue p-8 rounded-2xl shadow-2xl w-full max-w-md relative" data-aos="zoom-in">
+            <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
+            <h4 class="text-2xl font-bold mb-6 text-center">Informações de Pagamento</h4>
+            <form id="checkout-form">
+                <div class="mb-4">
+                    <label for="name" class="block font-bold mb-2">Nome Completo</label>
+                    <input type="text" id="name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block font-bold mb-2">E-mail</label>
+                    <input type="email" id="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required>
+                </div>
+                <div class="mb-4">
+                    <label for="card" class="block font-bold mb-2">Número do Cartão</label>
+                    <input type="text" id="card" placeholder="0000 0000 0000 0000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="expiry" class="block font-bold mb-2">Validade</label>
+                        <input type="text" id="expiry" placeholder="MM/AA" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required>
+                    </div>
+                    <div>
+                        <label for="cvc" class="block font-bold mb-2">CVC</label>
+                        <input type="text" id="cvc" placeholder="123" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary w-full font-bold py-4 px-10 rounded-full text-lg">
+                    Finalizar Compra
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Compra -->
+    <div id="successModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white text-dark-blue p-8 rounded-2xl shadow-2xl text-center max-w-sm" data-aos="zoom-in">
+            <h3 class="text-2xl font-bold mb-4 text-gold">Compra Realizada!</h3>
+            <p class="mb-6">Obrigado! Você receberá um e-mail de confirmação em breve.</p>
+            <button onclick="closeSuccessModal()" class="btn-primary font-bold py-2 px-8 rounded-full">Fechar</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        // Inicializa a biblioteca de animações
+        AOS.init({ duration: 800, once: true });
+
+        // Inicializa o Swiper (carrossel)
+        const swiper = new Swiper('.swiper.product-carousel', {
+            loop: true,
+            pagination: { el: '.swiper-pagination', clickable: true },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        });
+
+        // Lógica do Menu Mobile
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+        // Lógica de seleção de tamanho
+        const sizeSelector = document.getElementById('size-selector');
+        let selectedSize = null;
+        sizeSelector.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                selectedSize = e.target.dataset.size;
+            }
+        });
+
+        // Lógica de quantidade
+        const qtyInput = document.getElementById('quantity');
+        document.getElementById('qty-minus').addEventListener('click', () => {
+            let currentVal = parseInt(qtyInput.value);
+            if (currentVal > 1) qtyInput.value = currentVal - 1;
+        });
+        document.getElementById('qty-plus').addEventListener('click', () => {
+            qtyInput.value = parseInt(qtyInput.value) + 1;
+        });
+
+        // Lógica do Modal Guia de Tamanhos
+        const sizeGuideLink = document.getElementById('size-guide-link');
+        const sizeGuideModal = document.getElementById('sizeGuideModal');
+        sizeGuideLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            sizeGuideModal.classList.remove('hidden');
+            sizeGuideModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        });
+        function closeSizeGuideModal() {
+            sizeGuideModal.classList.add('hidden');
+            sizeGuideModal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Lógica do Modal de Pagamento
+        const buyButton = document.getElementById('buy-button');
+        const paymentModal = document.getElementById('paymentModal');
+        buyButton.addEventListener('click', () => {
+            if (!selectedSize) {
+                alert('Por favor, selecione um tamanho.');
+                return;
+            }
+            paymentModal.classList.remove('hidden');
+            paymentModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        });
+        function closePaymentModal() {
+            paymentModal.classList.add('hidden');
+            paymentModal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Lógica do Modal de Sucesso
+        const checkoutForm = document.getElementById('checkout-form');
+        const successModal = document.getElementById('successModal');
+        checkoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            closePaymentModal();
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            checkoutForm.reset();
+        });
+        function closeSuccessModal() {
+            successModal.classList.add('hidden');
+            successModal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - UMADEPAR 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-blue: #0f2b45;
+            --gold: #edbe66;
+            --light-gray: #d9d9d9;
+            --off-white: #f7fafc;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--off-white);
+        }
+        .sidebar { background-color: var(--dark-blue); }
+        .sidebar-link { border-left: 4px solid transparent; }
+        .sidebar-link.active, .sidebar-link:hover {
+            background-color: rgba(237, 190, 102, 0.1);
+            border-left-color: var(--gold);
+            color: var(--gold);
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .btn-primary { background-color: var(--gold); color: var(--dark-blue); }
+        .btn-primary:hover { filter: brightness(1.1); }
+        .btn-secondary { background-color: var(--dark-blue); color: white; }
+        .btn-secondary:hover { background-color: #1c3a58; }
+        
+        /* Estilos de Impressão */
+        @media print {
+            body * { visibility: hidden; }
+            #etiqueta-print-area, #etiqueta-print-area * { visibility: visible; }
+            #etiqueta-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+        .etiqueta-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .etiqueta-item {
+            border: 2px solid #0f2b45;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: sans-serif;
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 text-light-gray flex-shrink-0 flex flex-col">
+        <div class="h-20 flex items-center justify-center text-2xl font-bold text-gold border-b border-gold/20">
+            UMADEPAR ADM
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="#" class="sidebar-link active block py-3 px-4 rounded-lg transition" onclick="showView('dashboard')">Dashboard</a>
+            <a href="#" class="sidebar-link block py-3 px-4 rounded-lg transition" onclick="showView('vendas')">Vendas</a>
+            <a href="#" class="sidebar-link block py-3 px-4 rounded-lg transition" onclick="showView('etiquetas')">Etiquetas</a>
+            <a href="#" class="sidebar-link block py-3 px-4 rounded-lg transition" onclick="showView('financeiro')">Financeiro</a>
+        </nav>
+        <div class="p-4 border-t border-gold/20">
+            <a href="index.html" class="block text-center w-full py-2 px-4 rounded-lg bg-gold/10 text-gold hover:bg-gold/20">Sair</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-20 bg-white shadow-md flex items-center justify-between px-8">
+            <h1 id="view-title" class="text-2xl font-bold text-dark-blue">Dashboard</h1>
+            <div></div>
+        </header>
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-off-white p-8">
+            
+            <!-- VIEW: Dashboard -->
+            <div id="dashboard-view" class="admin-view">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="kpi-card p-6"><h3 class="text-gray-500">Total Arrecadado</h3><p id="kpi-receita" class="text-3xl font-bold text-dark-blue mt-2"></p></div>
+                    <div class="kpi-card p-6"><h3 class="text-gray-500">Camisetas Vendidas</h3><p id="kpi-camisetas" class="text-3xl font-bold text-dark-blue mt-2"></p></div>
+                    <div class="kpi-card p-6"><h3 class="text-gray-500">Participantes</h3><p id="kpi-participantes" class="text-3xl font-bold text-dark-blue mt-2"></p></div>
+                    <div class="kpi-card p-6"><h3 class="text-gray-500">Cidades Atendidas</h3><p id="kpi-cidades" class="text-3xl font-bold text-dark-blue mt-2"></p></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-xl font-bold text-dark-blue mb-4">Vendas Recentes</h3>
+                    <table class="w-full text-left">
+                        <thead><tr class="border-b"><th class="p-3">Líder</th><th class="p-3">Igreja</th><th class="p-3">Cidade</th><th class="p-3">Qtd.</th><th class="p-3">Valor</th></tr></thead>
+                        <tbody id="recentes-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VIEW: Vendas -->
+            <div id="vendas-view" class="admin-view hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-dark-blue">Todas as Vendas</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="searchInput" placeholder="Buscar por cidade, igreja..." class="p-2 border rounded-lg">
+                            <button class="btn-secondary py-2 px-4 rounded-lg" onclick="generatePDF()">Gerar Relatório PDF</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left" id="vendas-table">
+                            <thead><tr class="border-b"><th class="p-3">Líder</th><th class="p-3">Igreja</th><th class="p-3">Cidade</th><th class="p-3">Qtd.</th><th class="p-3">Valor</th><th class="p-3">Detalhes</th></tr></thead>
+                            <tbody id="vendas-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Etiquetas -->
+            <div id="etiquetas-view" class="admin-view hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-dark-blue">Gerador de Etiquetas</h3>
+                        <button class="btn-primary py-2 px-6 rounded-lg font-bold" onclick="showPrintPreview()">Imprimir Selecionadas</button>
+                    </div>
+                    <!-- Filtros -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border rounded-lg bg-gray-50">
+                        <input type="text" id="filter-nome" placeholder="Filtrar por nome..." class="p-2 border rounded-lg">
+                        <select id="filter-cidade" class="p-2 border rounded-lg"><option value="">Todas as Cidades</option></select>
+                        <select id="filter-tamanho" class="p-2 border rounded-lg"><option value="">Todos os Tamanhos</option></select>
+                    </div>
+                    <!-- Tabela de Participantes -->
+                    <div class="overflow-y-auto max-h-[50vh]">
+                        <table class="w-full text-left">
+                            <thead class="sticky top-0 bg-gray-100">
+                                <tr class="border-b">
+                                    <th class="p-3 w-10"><input type="checkbox" id="selectAllEtiquetas"></th>
+                                    <th class="p-3">Nome</th>
+                                    <th class="p-3">Tamanho</th>
+                                    <th class="p-3">Cidade</th>
+                                    <th class="p-3">Igreja</th>
+                                </tr>
+                            </thead>
+                            <tbody id="etiquetas-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Financeiro -->
+            <div id="financeiro-view" class="admin-view hidden">
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-xl font-bold text-dark-blue mb-4">Receita por Cidade</h3>
+                        <canvas id="cidadeChart"></canvas>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-xl font-bold text-dark-blue mb-4">Vendas por Tamanho</h3>
+                        <canvas id="tamanhoChart"></canvas>
+                    </div>
+                 </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL: Print Preview -->
+    <div id="printPreviewModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col">
+            <header class="p-4 flex justify-between items-center border-b">
+                <h2 class="text-xl font-bold text-dark-blue">Preview de Impressão</h2>
+                <div>
+                    <button class="btn-secondary py-2 px-4 rounded-lg mr-2" onclick="closeModal('printPreviewModal')">Cancelar</button>
+                    <button class="btn-primary py-2 px-6 rounded-lg font-bold" onclick="confirmPrint()">Imprimir</button>
+                </div>
+            </header>
+            <div id="preview-content" class="p-6 overflow-y-auto"></div>
+        </div>
+    </div>
+    
+    <!-- Área de Impressão (Oculta) -->
+    <div id="etiqueta-print-area" class="hidden"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        // --- DADOS MOCK ---
+        const mockData = [
+            { lider: "João da Silva", igreja: "AD Central", cidade: "Cascavel", participantes: [{ nome: "Ana Pereira", tamanho: "P" }, { nome: "Lucas Martins", tamanho: "M" }] },
+            { lider: "Maria Oliveira", igreja: "AD Madureira", cidade: "Curitiba", participantes: [{ nome: "Beatriz Costa", tamanho: "M" }, { nome: "Carlos Souza", tamanho: "G" }, { nome: "Daniela Lima", tamanho: "G" }] },
+            { lider: "Pedro Santos", igreja: "AD Belém", cidade: "Londrina", participantes: [{ nome: "Fernanda Alves", tamanho: "P" }] },
+            { lider: "Carla Ferreira", igreja: "AD Central", cidade: "Cascavel", participantes: [{ nome: "Gabriel Rocha", tamanho: "GG" }, { nome: "Helena Dias", tamanho: "P" }] },
+            { lider: "Marcos Almeida", igreja: "AD Missão", cidade: "Maringá", participantes: [{ nome: "Isabela Ribeiro", tamanho: "M" }, { nome: "Jorge Andrade", tamanho: "XG" }] },
+        ];
+
+        // --- LÓGICA DE NAVEGAÇÃO ---
+        const views = document.querySelectorAll('.admin-view');
+        const links = document.querySelectorAll('.sidebar-link');
+        const viewTitle = document.getElementById('view-title');
+        
+        function showView(viewId) {
+            views.forEach(view => view.classList.add('hidden'));
+            document.getElementById(`${viewId}-view`).classList.remove('hidden');
+            links.forEach(link => link.classList.remove('active'));
+            const activeLink = document.querySelector(`.sidebar-link[onclick="showView('${viewId}')"]`);
+            activeLink.classList.add('active');
+            viewTitle.textContent = activeLink.textContent;
+        }
+
+        // --- LÓGICA DE INICIALIZAÇÃO E RENDERIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDashboard();
+            populateVendas();
+            populateEtiquetas();
+            createCharts();
+            setupFilters();
+        });
+
+        function populateDashboard() { /* ... (código existente sem alterações) ... */ }
+        function populateVendas() { /* ... (código existente sem alterações) ... */ }
+        
+        function populateEtiquetas() {
+            const etiquetasBody = document.getElementById('etiquetas-table-body');
+            etiquetasBody.innerHTML = '';
+            mockData.forEach(venda => {
+                venda.participantes.forEach(p => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="p-3"><input type="checkbox" class="etiqueta-checkbox" data-info="${p.nome}|${p.tamanho}|${venda.cidade}|${venda.lider}|${venda.igreja}"></td>
+                        <td class="p-3">${p.nome}</td>
+                        <td class="p-3">${p.tamanho}</td>
+                        <td class="p-3">${venda.cidade}</td>
+                        <td class="p-3">${venda.igreja}</td>
+                    `;
+                    etiquetasBody.appendChild(row);
+                });
+            });
+        }
+
+        function setupFilters() {
+            const cidades = [...new Set(mockData.map(v => v.cidade))];
+            const tamanhos = [...new Set(mockData.flatMap(v => v.participantes).map(p => p.tamanho))];
+            const cidadeSelect = document.getElementById('filter-cidade');
+            const tamanhoSelect = document.getElementById('filter-tamanho');
+            cidades.forEach(c => cidadeSelect.innerHTML += `<option value="${c}">${c}</option>`);
+            tamanhos.forEach(t => tamanhoSelect.innerHTML += `<option value="${t}">${t}</option>`);
+            
+            document.getElementById('filter-nome').addEventListener('keyup', applyFilters);
+            cidadeSelect.addEventListener('change', applyFilters);
+            tamanhoSelect.addEventListener('change', applyFilters);
+            
+            document.getElementById('selectAllEtiquetas').addEventListener('change', (e) => {
+                document.querySelectorAll('#etiquetas-table-body tr:not(.hidden) .etiqueta-checkbox').forEach(cb => cb.checked = e.target.checked);
+            });
+        }
+
+        function applyFilters() {
+            const nomeFilter = document.getElementById('filter-nome').value.toLowerCase();
+            const cidadeFilter = document.getElementById('filter-cidade').value;
+            const tamanhoFilter = document.getElementById('filter-tamanho').value;
+            const rows = document.querySelectorAll('#etiquetas-table-body tr');
+            
+            rows.forEach(row => {
+                const nome = row.cells[1].textContent.toLowerCase();
+                const tamanho = row.cells[2].textContent;
+                const cidade = row.cells[3].textContent;
+                
+                const show = nome.includes(nomeFilter) &&
+                             (cidadeFilter === '' || cidade === cidadeFilter) &&
+                             (tamanhoFilter === '' || tamanho === tamanhoFilter);
+                
+                row.classList.toggle('hidden', !show);
+            });
+        }
+        
+        function showPrintPreview() {
+            const previewContent = document.getElementById('preview-content');
+            const selected = document.querySelectorAll('.etiqueta-checkbox:checked');
+            if (selected.length === 0) {
+                alert('Selecione pelo menos uma etiqueta para imprimir.');
+                return;
+            }
+            let html = '<div class="etiqueta-preview-grid">';
+            selected.forEach(cb => {
+                const [nome, tamanho, cidade, lider, igreja] = cb.dataset.info.split('|');
+                html += `<div class="etiqueta-item">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 8px;">
+                            <p style="font-weight: bold; font-size: 20px; margin: 0; color: #0f2b45;">${nome}</p>
+                            <p style="font-size: 20px; font-weight: bold; margin: 0; background-color: #f0f0f0; padding: 2px 8px; border-radius: 5px;">${tamanho}</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 14px; margin-top: 8px;">
+                        <p style="margin: 0;"><strong>Cidade:</strong> ${cidade}</p>
+                        <p style="margin: 0;"><strong>Igreja:</strong> ${igreja}</p>
+                        <p style="margin: 0;"><strong>Líder:</strong> ${lider}</p>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            previewContent.innerHTML = html;
+            openModal('printPreviewModal');
+        }
+
+        function confirmPrint() {
+            const printArea = document.getElementById('etiqueta-print-area');
+            printArea.innerHTML = document.getElementById('preview-content').innerHTML;
+            window.print();
+            printArea.innerHTML = '';
+        }
+
+        function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); document.getElementById(modalId).classList.add('flex'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); document.getElementById(modalId).classList.remove('flex'); }
+        
+        function generatePDF() { /* ... (código existente sem alterações) ... */ }
+        function createCharts() { /* ... (código existente sem alterações) ... */ }
+        document.getElementById('searchInput').addEventListener('keyup', (e) => { /* ... (código existente sem alterações) ... */ });
+        
+        // --- Funções mockadas do populateDashboard para evitar erros ---
+        function populateDashboard(){
+             let totalReceita = 0;
+            let totalCamisetas = 0;
+            let cidades = new Set();
+            mockData.forEach(venda => {
+                totalCamisetas += venda.participantes.length;
+                cidades.add(venda.cidade);
+            });
+            totalReceita = totalCamisetas * 79.90;
+
+            document.getElementById('kpi-receita').textContent = `R$ ${totalReceita.toFixed(2)}`;
+            document.getElementById('kpi-camisetas').textContent = totalCamisetas;
+            document.getElementById('kpi-participantes').textContent = totalCamisetas;
+            document.getElementById('kpi-cidades').textContent = cidades.size;
+
+            const recentesBody = document.getElementById('recentes-table-body');
+            recentesBody.innerHTML = '';
+            mockData.slice(0, 5).forEach(venda => {
+                const valor = (venda.participantes.length * 79.90).toFixed(2);
+                recentesBody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3">${venda.lider}</td><td class="p-3">${venda.igreja}</td><td class="p-3">${venda.cidade}</td><td class="p-3">${venda.participantes.length}</td><td class="p-3">R$ ${valor}</td></tr>`;
+            });
+        }
+        function populateVendas(){
+            const vendasBody = document.getElementById('vendas-table-body');
+            vendasBody.innerHTML = '';
+            mockData.forEach(venda => {
+                const valor = (venda.participantes.length * 79.90).toFixed(2);
+                vendasBody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3">${venda.lider}</td><td class="p-3">${venda.igreja}</td><td class="p-3">${venda.cidade}</td><td class="p-3">${venda.participantes.length}</td><td class="p-3">R$ ${valor}</td><td class="p-3"><button class="text-blue-600 hover:underline">Ver</button></td></tr>`;
+            });
+        }
+        function generatePDF(){
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Relatório de Vendas - UMADEPAR 2025", 14, 16);
+            doc.autoTable({
+                head: [['Líder', 'Igreja', 'Cidade', 'Qtd.', 'Valor (R$)']],
+                body: mockData.map(v => [v.lider, v.igreja, v.cidade, v.participantes.length, (v.participantes.length * 79.90).toFixed(2)]),
+                startY: 20
+            });
+            doc.save('relatorio-vendas-umadepar.pdf');
+        }
+        function createCharts(){
+            const receitaPorCidade = mockData.reduce((acc, venda) => {
+                const valor = venda.participantes.length * 79.90;
+                acc[venda.cidade] = (acc[venda.cidade] || 0) + valor;
+                return acc;
+            }, {});
+            new Chart(document.getElementById('cidadeChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(receitaPorCidade),
+                    datasets: [{ label: 'Receita por Cidade', data: Object.values(receitaPorCidade), backgroundColor: '#edbe66' }]
+                }
+            });
+
+            const vendasPorTamanho = mockData.flatMap(v => v.participantes).reduce((acc, p) => {
+                acc[p.tamanho] = (acc[p.tamanho] || 0) + 1;
+                return acc;
+            }, {});
+            new Chart(document.getElementById('tamanhoChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(vendasPorTamanho),
+                    datasets: [{ label: 'Vendas por Tamanho', data: Object.values(vendasPorTamanho), backgroundColor: ['#0f2b45', '#1c3a58', '#2a4c6d', '#edbe66', '#d9d9d9'] }]
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
