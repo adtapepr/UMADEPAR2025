@@ -1,57 +1,153 @@
-# React + TypeScript + Vite
+# UMADEPAR 2025 - Sistema de Vendas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🎯 Sistema de vendas de camisetas para o evento UMADEPAR 2025, desenvolvido com React, TypeScript, Supabase e integração com Mercado Pago.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS
+- **Backend**: Supabase (PostgreSQL + Edge Functions)
+- **Pagamentos**: Mercado Pago API
+- **Deploy**: Vercel
+- **Monitoramento**: Sentry
 
-## Expanding the ESLint configuration
+## 📋 Funcionalidades
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 👥 Para Usuários
+- ✅ Autenticação via Supabase Auth
+- ✅ Compra individual de camisetas
+- ✅ Compra em grupo (múltiplos participantes)
+- ✅ Integração com Mercado Pago para pagamentos
+- ✅ Acompanhamento de pedidos
+- ✅ Geração de etiquetas para envio
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 🔧 Para Administradores
+- ✅ Dashboard administrativo
+- ✅ Gestão de pedidos
+- ✅ Relatórios financeiros
+- ✅ Controle de participantes
+- ✅ Webhooks do Mercado Pago
+
+## 🛠️ Configuração do Ambiente
+
+### Pré-requisitos
+- Node.js 18+
+- npm ou yarn
+- Conta no Supabase
+- Conta no Mercado Pago (credenciais de produção)
+- Conta no Vercel (para deploy)
+
+### Variáveis de Ambiente
+
+Crie um arquivo `.env` baseado no `.env.example`:
+
+```bash
+# Supabase Configuration
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
+
+# Site Configuration
+VITE_SITE_URL=https://seu-dominio.vercel.app
+
+# Mercado Pago Configuration - PRODUÇÃO
+VITE_MP_PUBLIC_KEY=APP_USR-sua_public_key_de_producao
+MP_ACCESS_TOKEN=APP_USR-seu_access_token_de_producao
+
+# Supabase Service Role Key (para Edge Functions)
+SUPABASE_SERVICE_ROLE_KEY=sua_service_role_key
+
+# Environment Configuration
+VITE_ENVIRONMENT=production
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Instalação
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Clone o repositório
+git clone https://github.com/adtapepr/UMADEPAR2025.git
+cd UMADEPAR2025
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# Instale as dependências
+npm install
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o arquivo .env com suas credenciais
+
+# Execute as migrações do banco
+npx supabase db push
+
+# Inicie o servidor de desenvolvimento
+npm run dev
 ```
+
+## 🚀 Deploy
+
+### Supabase Edge Functions
+
+```bash
+# Deploy das Edge Functions
+npx supabase functions deploy create-preference
+npx supabase functions deploy mp-webhook
+```
+
+### Vercel
+
+```bash
+# Deploy para produção
+npx vercel --prod
+```
+
+## 📊 Estrutura do Banco de Dados
+
+### Tabelas Principais
+- `users` - Usuários do sistema
+- `pedidos` - Pedidos realizados
+- `itens_pedido` - Itens de cada pedido
+- `participantes` - Participantes dos pedidos em grupo
+
+### Views
+- `payment_details_view` - Detalhes de pagamentos
+- `financial_summary_view` - Resumo financeiro
+
+## 🔧 Configuração do Mercado Pago
+
+1. Acesse o [Painel do Desenvolvedor do Mercado Pago](https://www.mercadopago.com.br/developers)
+2. Crie uma aplicação
+3. Obtenha as credenciais de **produção**:
+   - Public Key (começa com `APP_USR-`)
+   - Access Token (começa com `APP_USR-`)
+4. Configure o webhook para: `https://seu-dominio.supabase.co/functions/v1/mp-webhook`
+
+## 🐛 Troubleshooting
+
+### Problema: URLs do Sandbox
+Se o Mercado Pago estiver retornando URLs do sandbox mesmo com credenciais de produção:
+
+1. Verifique se `VITE_ENVIRONMENT=production` está configurado
+2. Confirme que as credenciais são de produção (começam com `APP_USR-`)
+3. Verifique os logs no console do navegador
+
+### Logs de Debug
+O sistema inclui logs detalhados para debug:
+- Variáveis de ambiente
+- Respostas da API do Mercado Pago
+- Status de produção vs sandbox
+
+## 📝 Licença
+
+Este projeto é privado e destinado exclusivamente ao evento UMADEPAR 2025.
+
+## 👥 Contribuição
+
+Para contribuir com o projeto:
+
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## 📞 Suporte
+
+Para suporte técnico, entre em contato através dos issues do GitHub ou pelo email do desenvolvedor.
