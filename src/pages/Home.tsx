@@ -320,7 +320,7 @@ export default function Home() {
                         <div className="w-16 h-16 aspect-square rounded-full bg-[#edbe66] items-center justify-center text-[#0f2b45] font-bold flex-shrink-0 mx-auto mb-3 flex">
                           {user.email?.charAt(0).toUpperCase()}
                         </div>
-                        <h4 className="font-bold text-center">{user.user_metadata?.name || 'Usuário'}</h4>
+                        <h4 className="font-bold text-center">{userData?.nome || 'Usuário'}</h4>
                         <p className="text-white text-sm text-center">{user.email}</p>
                       </div>
                       <hr className="border-gray-200 mb-4" />

@@ -26,8 +26,8 @@ interface MercadoPagoPreference {
     unit_price: number;
   }>;
   payer: {
-    first_name: string;
-    last_name: string;
+    name: string;
+    surname: string;
     email?: string;
   };
   back_urls: {
@@ -167,8 +167,8 @@ serve(async (req) => {
       },
       items_count: orderItems?.length || 0,
       payer: {
-        first_name: firstName,
-        last_name: lastName
+        name: firstName,
+        surname: lastName
       },
       timestamp: new Date().toISOString()
     });
@@ -201,14 +201,14 @@ serve(async (req) => {
     const preference: MercadoPagoPreference = {
       items,
       payer: {
-        first_name: firstName,
-        last_name: lastName,
+        name: firstName,
+        surname: lastName,
         email: order.users.email
       },
       back_urls: {
-        success: `${Deno.env.get('SITE_URL')}/pedido/sucesso`,
-        pending: `${Deno.env.get('SITE_URL')}/pedido/pendente`,
-        failure: `${Deno.env.get('SITE_URL')}/pedido/falha`,
+        success: `${Deno.env.get('SITE_URL')}/meus-pedidos`,
+        pending: `${Deno.env.get('SITE_URL')}/meus-pedidos`,
+        failure: `${Deno.env.get('SITE_URL')}/meus-pedidos`,
       },
       notification_url: `https://bwrgpdlxhudtyewlmscl.supabase.co/functions/v1/mp-webhook`,
       external_reference: order.id,
@@ -238,8 +238,8 @@ serve(async (req) => {
           unit_price: item.unit_price
         })),
         payer: {
-          first_name: preference.payer.first_name,
-          last_name: preference.payer.last_name,
+          name: preference.payer.name,
+          surname: preference.payer.surname,
           email: preference.payer.email
         },
         external_reference: preference.external_reference,

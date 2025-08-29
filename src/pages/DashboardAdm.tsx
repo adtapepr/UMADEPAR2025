@@ -4,6 +4,7 @@ import { supabase } from '../services/orderService';
 import { useAuth } from '../contexts/AuthContext';
 import CustomDropdown from '../components/CustomDropdown';
 
+// Interface para a view vw_participantes_completo
 interface Participant {
   id: string;
   nome: string;
@@ -12,6 +13,7 @@ interface Participant {
   cidade?: string;
   igreja?: string;
   observacoes?: string;
+  created_at: string;
   comprador_nome: string;
   comprador_email: string;
   comprador_tipo: string;
@@ -21,7 +23,46 @@ interface Participant {
   item_quantidade: number;
   item_preco: number;
   valor_real_pago: number;
-  created_at: string;
+}
+
+// Interface para a view vw_dados_financeiros
+interface FinancialData {
+  pedido_id: string;
+  user_id: string;
+  comprador_nome: string;
+  comprador_email: string;
+  tipo_pedido: string;
+  valor_pedido_original: number;
+  status_pedido: string;
+  data_criacao_pedido: string;
+  data_atualizacao_pedido: string;
+  mp_preference_id?: string;
+  mp_payment_id?: string;
+  mp_status?: string;
+  mp_status_detail?: string;
+  mp_external_reference?: string;
+  valor_pago_real?: number;
+  moeda?: string;
+  taxa_mp?: number;
+  valor_liquido_recebido?: number;
+  metodo_pagamento?: string;
+  tipo_pagamento?: string;
+  parcelas?: number;
+  data_criacao_pagamento?: string;
+  data_aprovacao_pagamento?: string;
+  bin_cartao?: string;
+  final_cartao?: string;
+  banco_emissor?: string;
+  mp_collector_id?: string;
+  tipo_operacao?: string;
+  metodo_pagamento_descricao?: string;
+  status_pagamento_descricao?: string;
+  diferenca_valor?: number;
+  tempo_aprovacao_minutos?: number;
+  tem_pagamento_mp?: boolean;
+  pagamento_aprovado?: boolean;
+  pagamento_parcelado?: boolean;
+  pagamento_cartao?: boolean;
 }
 
 interface Sale {
@@ -58,6 +99,22 @@ interface OrdersData {
   data_criacao: string;
 }
 
+// Interface para estatísticas calculadas das views
+interface ViewStats {
+  receita_total: number;
+  receita_pendente: number;
+  camisetas_vendidas: number;
+  camisetas_pendentes: number;
+  participantes_total: number;
+  participantes_pagos: number;
+  pedidos_pagos: number;
+  pedidos_pendentes: number;
+  pedidos_total: number;
+  cidades_unicas: number;
+  metodos_pagamento: { [key: string]: { count: number; value: number } };
+  tamanhos_vendidos: { [key: string]: number };
+}
+
 interface OrdersStats {
   camisetasRecebidas: number;
   camisetasPendentes: number;
@@ -75,6 +132,8 @@ const DashboardAdm: React.FC = () => {
   const { user } = useAuth();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [ordersData, setOrdersData] = useState<OrdersData[]>([]);
+  const [financialData, setFinancialData] = useState<FinancialData[]>([]);
+  const [viewStats, setViewStats] = useState<ViewStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<'pedidos' | 'participantes' | 'etiquetas'>('pedidos');
@@ -370,51 +429,107 @@ const DashboardAdm: React.FC = () => {
       if (userProfile.tipo !== 'admin') {
         throw new Error('Acesso negado. Apenas administradores podem acessar esta página.');
       }
-
-      const { data, error } = await supabase
+      
+      // Tentar buscar da view primeiro
+      let { data, error } = await supabase
         .from('vw_participantes_completo')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      // Se a view não retornar dados, buscar das tabelas base
+      if (!data || data.length === 0) {
+        console.log('View vazia, buscando das tabelas base...');
+        const { data: participantesData, error: participantesError } = await supabase
+          .from('participantes')
+          .select(`
+            *,
+            itens_pedido!inner(
+              id,
+              pedido_id,
+              tamanho,
+              quantidade,
+              preco_unitario,
+              pedidos!inner(
+                id,
+                user_id,
+                tipo_pedido,
+                valor_total,
+                status,
+                created_at,
+                updated_at,
+                users!inner(
+                  id,
+                  nome,
+                  email,
+                  tipo
+                )
+              )
+            )
+          `);
+
+        if (participantesError) {
+          throw participantesError;
+        }
+
+        // Transformar dados para o formato esperado
+        data = (participantesData || []).map((p: any) => ({
+          id: p.id,
+          nome: p.nome,
+          tamanho: p.itens_pedido.tamanho,
+          telefone: p.telefone,
+          cidade: p.cidade,
+          igreja: p.igreja,
+          observacoes: p.observacoes,
+          created_at: p.created_at,
+          comprador_nome: p.itens_pedido.pedidos.users.nome,
+          comprador_email: p.itens_pedido.pedidos.users.email,
+          comprador_tipo: p.itens_pedido.pedidos.users.tipo,
+          pedido_id: p.itens_pedido.pedido_id,
+          pedido_status: p.itens_pedido.pedidos.status,
+          pedido_valor: p.itens_pedido.pedidos.valor_total,
+          item_quantidade: p.itens_pedido.quantidade,
+          item_preco: p.itens_pedido.preco_unitario,
+          valor_real_pago: p.itens_pedido.pedidos.valor_total
+        }));
+      }
 
       setParticipants(data || []);
-      await fetchOrdersData();
+      await fetchOrdersData(data || []);
     } catch (err: any) {
-      console.error('Erro ao buscar participantes:', err);
       setError(err.message);
-      await fetchOrdersData();
+      await fetchOrdersData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchOrdersData = async () => {
+  const fetchOrdersData = async (participantsData: Participant[] = []) => {
     try {
-      console.log('🔍 [DashboardAdm] Iniciando busca de dados financeiros...');
+      console.log('🔍 [fetchOrdersData] Iniciando busca de dados financeiros...');
 
       // Primeiro, tentar buscar da view financeira
-      const { data: financialData, error: financialError } = await supabase
-        .from('vw_dados_financeiros')
+      console.log('🔍 [fetchOrdersData] Tentando buscar da view vw_payment_details...');
+      
+      let { data: financialData, error: financialError } = await supabase
+        .from('vw_payment_details')
         .select('*')
         .order('data_criacao_pedido', { ascending: false });
 
       if (financialError) {
-        console.warn('⚠️ [DashboardAdm] View financeira não encontrada, usando método alternativo:', financialError);
+        console.error('❌ [fetchOrdersData] Erro ao buscar dados da view vw_payment_details:', financialError);
+        throw financialError;
+      }
 
-        // Fallback: buscar dados de pedidos da forma tradicional
+      if (!financialData || financialData.length === 0) {
+        console.log('⚠️ [fetchOrdersData] View vazia, buscando das tabelas base...');
+        
+        // Buscar das tabelas base
         const { data: pedidosData, error: pedidosError } = await supabase
           .from('pedidos')
           .select(`
-            id,
-            user_id,
-            valor_total,
-            status,
-            created_at,
-            mp_payment_id,
-            mp_status,
-            mp_transaction_amount,
+            *,
             users!inner(
+              id,
               nome,
               email,
               tipo
@@ -422,74 +537,311 @@ const DashboardAdm: React.FC = () => {
           `)
           .order('created_at', { ascending: false });
 
-        if (pedidosError) throw pedidosError;
+        if (pedidosError) {
+          throw pedidosError;
+        }
 
-        console.log('📊 [DashboardAdm] Dados de pedidos encontrados:', pedidosData?.length || 0);
-
-        // Buscar participantes para cada pedido
-        const transformedData = await Promise.all((pedidosData || []).map(async (pedido: any) => {
-          const { data: participantesData } = await supabase
-            .from('vw_participantes_completo')
-            .select('nome, tamanho, item_quantidade')
-            .eq('pedido_id', pedido.id);
-
-          const user = pedido.users;
-          return {
-            pedido_id: pedido.id,
-            comprador_nome: user.nome,
-            comprador_email: user.email,
-            comprador_tipo: user.tipo,
-            status_pedido: pedido.status,
-            participantes: (participantesData || []).map((p: any) => ({
-              nome: p.nome,
-              tamanho: p.tamanho,
-              quantidade: p.item_quantidade
-            })),
-            valor_total: pedido.valor_total,
-            valor_real_pago: pedido.mp_transaction_amount || pedido.valor_total,
-            mp_status: pedido.mp_status,
-            data_criacao: pedido.created_at
-          };
+        // Transformar dados das tabelas base para o formato da view
+        financialData = (pedidosData || []).map((pedido: any) => ({
+          pedido_id: pedido.id,
+          user_id: pedido.user_id,
+          comprador_nome: pedido.users.nome,
+          comprador_email: pedido.users.email,
+          tipo_pedido: pedido.tipo_pedido,
+          valor_pedido_original: parseFloat(pedido.valor_total),
+          status_pedido: pedido.status,
+          data_criacao_pedido: pedido.created_at,
+          data_atualizacao_pedido: pedido.updated_at,
+          mp_preference_id: pedido.mp_preference_id,
+          mp_payment_id: pedido.mp_payment_id,
+          mp_status: pedido.mp_status,
+          mp_status_detail: pedido.mp_status_detail,
+          mp_external_reference: pedido.mp_external_reference,
+          valor_pago_real: pedido.mp_transaction_amount ? parseFloat(pedido.mp_transaction_amount) : parseFloat(pedido.valor_total),
+          moeda: pedido.mp_currency_id || 'BRL',
+          taxa_mp: pedido.mp_fee_amount ? parseFloat(pedido.mp_fee_amount) : 0,
+          valor_liquido_recebido: pedido.mp_net_amount ? parseFloat(pedido.mp_net_amount) : parseFloat(pedido.valor_total),
+          metodo_pagamento: pedido.mp_payment_method_id,
+          tipo_pagamento: pedido.mp_payment_type_id,
+          parcelas: pedido.mp_installments || 1,
+          data_criacao_pagamento: pedido.mp_date_created,
+          data_aprovacao_pagamento: pedido.mp_date_approved,
+          bin_cartao: pedido.mp_card_first_six_digits,
+          final_cartao: pedido.mp_card_last_four_digits,
+          banco_emissor: pedido.mp_issuer_id,
+          mp_collector_id: pedido.mp_collector_id,
+          tipo_operacao: pedido.mp_operation_type,
+          metodo_pagamento_descricao: pedido.mp_payment_method_id,
+          status_pagamento_descricao: pedido.mp_status_detail,
+          diferenca_valor: 0,
+          tempo_aprovacao_minutos: 0,
+          tem_pagamento_mp: !!pedido.mp_payment_id,
+          pagamento_aprovado: pedido.mp_status === 'approved',
+          pagamento_parcelado: (pedido.mp_installments || 1) > 1,
+          pagamento_cartao: pedido.mp_payment_type_id === 'credit_card' || pedido.mp_payment_type_id === 'debit_card'
         }));
-
-        setOrdersData(transformedData);
-      } else {
-        console.log('✅ [DashboardAdm] Dados financeiros encontrados na view:', financialData?.length || 0);
-
-        // Transformar dados da view financeira para o formato esperado
-        const transformedFinancialData = await Promise.all((financialData || []).map(async (item: any) => {
-          const { data: participantesData } = await supabase
-            .from('vw_participantes_completo')
-            .select('nome, tamanho, item_quantidade')
-            .eq('pedido_id', item.pedido_id);
-
-          return {
-            pedido_id: item.pedido_id,
-            comprador_nome: item.comprador_nome,
-            comprador_email: item.comprador_email,
-            comprador_tipo: item.comprador_tipo,
-            status_pedido: item.status_pedido,
-            participantes: (participantesData || []).map((p: any) => ({
-              nome: p.nome,
-              tamanho: p.tamanho,
-              quantidade: p.item_quantidade
-            })),
-            valor_total: item.valor_pedido_original,
-            valor_real_pago: item.valor_pago_real || item.valor_pedido_original,
-            mp_status: item.status_mp,
-            metodo_pagamento: item.metodo_pagamento,
-            data_criacao: item.data_criacao_pedido
-          };
-        }));
-
-        setOrdersData(transformedFinancialData);
+        
+        console.log('✅ [fetchOrdersData] Dados carregados das tabelas base:', financialData?.length || 0);
       }
 
-      console.log('✅ [DashboardAdm] Dados financeiros carregados com sucesso');
+      console.log('✅ [fetchOrdersData] Dados financeiros encontrados na view:', financialData?.length || 0);
+      
+      // Usar dados diretamente da view vw_payment_details
+      setFinancialData(financialData);
+      await calculateOptimizedStats();
+      
+      // Transformar dados para o formato OrdersData
+      const transformedOrdersData = await Promise.all((financialData || []).map(async (item: any) => {
+        const { data: participantesData } = await supabase
+          .from('vw_participantes_completo')
+          .select('nome, tamanho, item_quantidade')
+          .eq('pedido_id', item.pedido_id);
+
+        return {
+          pedido_id: item.pedido_id,
+          comprador_nome: item.comprador_nome,
+          comprador_email: item.comprador_email,
+          comprador_tipo: 'jovem', // Valor padrão, será ajustado conforme necessário
+          status_pedido: item.status_pedido,
+          participantes: (participantesData || []).map((p: any) => ({
+            nome: p.nome,
+            tamanho: p.tamanho,
+            quantidade: p.item_quantidade
+          })),
+          valor_total: item.valor_pedido_original,
+          valor_real_pago: item.valor_pago_real || item.valor_pedido_original,
+          mp_status: item.mp_status,
+          metodo_pagamento: item.metodo_pagamento_descricao || item.metodo_pagamento,
+          data_criacao: item.data_criacao_pedido
+        };
+      }));
+
+      setOrdersData(transformedOrdersData);
+      
+      console.log('✅ [fetchOrdersData] Dados financeiros carregados com sucesso');
     } catch (err: any) {
-      console.error('❌ [DashboardAdm] Erro ao buscar dados financeiros:', err);
+      console.error('❌ [fetchOrdersData] Erro ao buscar dados financeiros:', err);
       setOrdersData([]);
+      setFinancialData([]);
     }
+  };
+
+  // Função otimizada para calcular estatísticas diretamente das views
+  const calculateOptimizedStats = async () => {
+    try {
+      console.log('🔍 [calculateOptimizedStats] Iniciando busca de estatísticas das tabelas...');
+      
+      // Buscar dados diretamente da tabela pedidos para receita total
+      const { data: pedidosData, error: pedidosError } = await supabase
+        .from('pedidos')
+        .select(`
+          id,
+          valor_total,
+          status,
+          mp_transaction_amount,
+          mp_payment_method_id,
+          created_at
+        `);
+
+      if (pedidosError) {
+        console.error('❌ [calculateOptimizedStats] Erro ao buscar dados da tabela pedidos:', pedidosError);
+        throw pedidosError;
+      }
+
+      console.log('✅ [calculateOptimizedStats] Dados da tabela pedidos carregados:', pedidosData?.length || 0, 'registros');
+
+      // Buscar dados dos participantes com joins para outras estatísticas
+      const { data: participantsData, error: participantsError } = await supabase
+        .from('participantes')
+        .select(`
+          *,
+          itens_pedido!inner(
+            id,
+            pedido_id,
+            tamanho,
+            quantidade,
+            preco_unitario,
+            pedidos!inner(
+              id,
+              user_id,
+              tipo_pedido,
+              valor_total,
+              status,
+              created_at
+            )
+          )
+        `);
+
+      if (participantsError) {
+        console.error('❌ [calculateOptimizedStats] Erro ao buscar dados dos participantes:', participantsError);
+        throw participantsError;
+      }
+
+      console.log('✅ [calculateOptimizedStats] Dados dos participantes carregados:', participantsData?.length || 0, 'registros');
+
+      const stats: ViewStats = {
+        receita_total: 0,
+        receita_pendente: 0,
+        camisetas_vendidas: 0,
+        camisetas_pendentes: 0,
+        participantes_total: participantsData?.length || 0,
+        participantes_pagos: 0,
+        pedidos_pagos: 0,
+        pedidos_pendentes: 0,
+        pedidos_total: pedidosData?.length || 0,
+        cidades_unicas: 0,
+        metodos_pagamento: {},
+        tamanhos_vendidos: {}
+      };
+
+      // Calcular receita total diretamente da tabela pedidos
+      if (pedidosData && pedidosData.length > 0) {
+        pedidosData.forEach((pedido: any) => {
+          const valorTotal = parseFloat(pedido.valor_total) || 0;
+          const valorPago = pedido.mp_transaction_amount ? parseFloat(pedido.mp_transaction_amount) : valorTotal;
+          const isPago = pedido.status === 'pago';
+          const isPendente = pedido.status === 'pendente';
+          
+          if (isPago) {
+            stats.receita_total += valorTotal; // Usar valor_total da tabela pedidos
+            stats.pedidos_pagos += 1;
+            
+            // Contar métodos de pagamento
+            const metodo = pedido.mp_payment_method_id || 'Não informado';
+            if (!stats.metodos_pagamento[metodo]) {
+              stats.metodos_pagamento[metodo] = { count: 0, value: 0 };
+            }
+            stats.metodos_pagamento[metodo].count += 1;
+            stats.metodos_pagamento[metodo].value += valorTotal;
+          } else if (isPendente) {
+            stats.receita_pendente += valorTotal;
+            stats.pedidos_pendentes += 1;
+          }
+        });
+      }
+
+      // Calcular estatísticas dos participantes
+      if (participantsData && participantsData.length > 0) {
+        const cidadesUnicas = new Set();
+        
+        participantsData.forEach((participant: any) => {
+          const isPago = participant.itens_pedido.pedidos.status === 'pago';
+          const cidade = participant.cidade;
+          const tamanho = participant.itens_pedido.tamanho;
+          const quantidade = participant.itens_pedido.quantidade || 1;
+          
+          if (cidade) {
+            cidadesUnicas.add(cidade);
+          }
+          
+          if (isPago) {
+            stats.participantes_pagos += 1;
+            stats.camisetas_vendidas += quantidade;
+            
+            // Contar tamanhos vendidos
+            if (tamanho) {
+              if (!stats.tamanhos_vendidos[tamanho]) {
+                stats.tamanhos_vendidos[tamanho] = 0;
+              }
+              stats.tamanhos_vendidos[tamanho] += quantidade;
+            }
+          } else {
+            stats.camisetas_pendentes += quantidade;
+          }
+        });
+        
+        stats.cidades_unicas = cidadesUnicas.size;
+      }
+
+      console.log('📊 [calculateOptimizedStats] Estatísticas calculadas:', stats);
+      setViewStats(stats);
+      return stats;
+    } catch (error) {
+      console.error('❌ [calculateOptimizedStats] Erro ao calcular estatísticas:', error);
+      
+      // Definir estatísticas vazias em caso de erro
+      const emptyStats: ViewStats = {
+        receita_total: 0,
+        receita_pendente: 0,
+        camisetas_vendidas: 0,
+        camisetas_pendentes: 0,
+        participantes_total: 0,
+        participantes_pagos: 0,
+        pedidos_pagos: 0,
+        pedidos_pendentes: 0,
+        pedidos_total: 0,
+        cidades_unicas: 0,
+        metodos_pagamento: {},
+        tamanhos_vendidos: {}
+      };
+      setViewStats(emptyStats);
+      return null;
+    }
+  };
+
+  // Função de fallback para compatibilidade
+  const calculateViewStats = (financialData: FinancialData[], participantsData: Participant[]) => {
+    const stats: ViewStats = {
+      receita_total: 0,
+      receita_pendente: 0,
+      camisetas_vendidas: 0,
+      camisetas_pendentes: 0,
+      participantes_total: participantsData.length,
+      participantes_pagos: 0,
+      pedidos_pagos: 0,
+      pedidos_pendentes: 0,
+      pedidos_total: 0,
+      cidades_unicas: 0,
+      metodos_pagamento: {},
+      tamanhos_vendidos: {}
+    };
+
+    // Calcular estatísticas dos dados financeiros
+    const pedidosUnicos = new Set();
+    const cidadesUnicas = new Set();
+    
+    financialData.forEach(item => {
+      pedidosUnicos.add(item.pedido_id);
+      
+      if (item.pagamento_aprovado) {
+        stats.receita_total += item.valor_pago_real || 0;
+        stats.pedidos_pagos++;
+        
+        // Contar métodos de pagamento
+        const metodo = item.metodo_pagamento_descricao || item.metodo_pagamento || 'Não informado';
+        if (!stats.metodos_pagamento[metodo]) {
+          stats.metodos_pagamento[metodo] = { count: 0, value: 0 };
+        }
+        stats.metodos_pagamento[metodo].count++;
+        stats.metodos_pagamento[metodo].value += item.valor_pago_real || 0;
+      } else {
+        stats.receita_pendente += item.valor_pedido_original || 0;
+        stats.pedidos_pendentes++;
+      }
+    });
+
+    stats.pedidos_total = pedidosUnicos.size;
+
+    // Calcular estatísticas dos participantes
+    participantsData.forEach(participant => {
+      if (participant.cidade) {
+        cidadesUnicas.add(participant.cidade);
+      }
+      
+      if (participant.pedido_status === 'pago') {
+        stats.camisetas_vendidas += participant.item_quantidade || 0;
+        stats.participantes_pagos++;
+        
+        // Contar tamanhos vendidos
+        const tamanho = participant.tamanho || 'Não informado';
+        stats.tamanhos_vendidos[tamanho] = (stats.tamanhos_vendidos[tamanho] || 0) + (participant.item_quantidade || 0);
+      } else {
+        stats.camisetas_pendentes += participant.item_quantidade || 0;
+      }
+    });
+
+    stats.cidades_unicas = cidadesUnicas.size;
+    setViewStats(stats);
   };
 
   const exportOrdersData = () => {
@@ -521,11 +873,30 @@ const DashboardAdm: React.FC = () => {
 
   useEffect(() => {
     fetchParticipants();
-    fetchUniqueCities();
-    fetchUniqueSizes();
   }, []);
 
+  // Atualizar filtros quando os dados dos participantes mudarem
+  useEffect(() => {
+    if (participants.length > 0) {
+      fetchUniqueCities();
+      fetchUniqueSizes();
+    }
+  }, [participants]);
+
   const calculateStats = (participants: Participant[], pedidos: any[] = []) => {
+    // Usar dados das views se disponíveis, senão usar cálculo local
+    if (viewStats) {
+      return {
+        receita: viewStats.receita_total,
+        camisetas: viewStats.camisetas_vendidas,
+        participantes: viewStats.participantes_total,
+        cidades: viewStats.cidades_unicas,
+        pedidosPagos: viewStats.pedidos_pagos,
+        pedidosPendentes: viewStats.pedidos_pendentes
+      };
+    }
+
+    // Fallback para cálculo local
     const statusMap = new Map(pedidos.map(p => [p.id, p.status]));
 
     const participantesPagos = participants.filter(p => {
@@ -554,39 +925,96 @@ const DashboardAdm: React.FC = () => {
   const [uniqueCities, setUniqueCities] = useState<string[]>([]);
   const [uniqueSizes, setUniqueSizes] = useState<string[]>([]);
 
-  // Função para buscar cidades únicas do banco de dados (apenas pedidos pagos)
+  // Função otimizada para buscar cidades únicas das views
   const fetchUniqueCities = async () => {
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('vw_participantes_completo')
         .select('cidade')
         .eq('pedido_status', 'pago')
         .not('cidade', 'is', null)
-        .not('cidade', 'eq', '')
-        .order('cidade');
+        .neq('cidade', '');
 
-      if (error) throw error;
+      // Se a view não retornar dados, buscar das tabelas base
+      if (!data || data.length === 0) {
+        console.log('View de participantes vazia, buscando cidades das tabelas base...');
+        const { data: participantesData, error: participantesError } = await supabase
+          .from('participantes')
+          .select(`
+            cidade,
+            itens_pedido!inner(
+              pedidos!inner(
+                status
+              )
+            )
+          `)
+          .eq('itens_pedido.pedidos.status', 'pago')
+          .not('cidade', 'is', null)
+          .neq('cidade', '');
 
-      const cities = [...new Set(data?.map(item => item.cidade) || [])].sort();
+        if (participantesError) {
+          throw participantesError;
+        }
+
+        data = participantesData;
+      }
+
+      if (error && (!data || data.length === 0)) throw error;
+
+      const cities = [...new Set(data?.map(p => p.cidade) || [])].sort();
       setUniqueCities(cities);
     } catch (error) {
-      console.error('Erro ao buscar cidades:', error);
+      console.error('Erro ao buscar cidades únicas:', error);
+      // Fallback para dados locais
+      const cities = [...new Set(
+        participants
+          .filter(p => p.pedido_status === 'pago' && p.cidade && p.cidade.trim() !== '')
+          .map(p => p.cidade)
+      )].sort();
+      setUniqueCities(cities);
     }
   };
 
-  // Função para buscar tamanhos únicos do banco de dados com ordenação correta (apenas pedidos pagos)
+  // Função otimizada para buscar tamanhos únicos das views
   const fetchUniqueSizes = async () => {
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('vw_participantes_completo')
         .select('tamanho')
         .eq('pedido_status', 'pago')
         .not('tamanho', 'is', null)
-        .not('tamanho', 'eq', '');
+        .neq('tamanho', '');
 
-      if (error) throw error;
+      // Se a view não retornar dados, buscar das tabelas base
+      if (!data || data.length === 0) {
+        console.log('View de participantes vazia, buscando tamanhos das tabelas base...');
+        const { data: participantesData, error: participantesError } = await supabase
+          .from('participantes')
+          .select(`
+            itens_pedido!inner(
+              tamanho,
+              pedidos!inner(
+                status
+              )
+            )
+          `)
+          .eq('itens_pedido.pedidos.status', 'pago')
+          .not('itens_pedido.tamanho', 'is', null)
+          .neq('itens_pedido.tamanho', '');
 
-      const sizes = [...new Set(data?.map(item => item.tamanho) || [])];
+        if (participantesError) {
+          throw participantesError;
+        }
+
+        // Transformar dados para o formato esperado
+        data = participantesData?.map((p: any) => ({
+          tamanho: p.itens_pedido.tamanho
+        })) || [];
+      }
+
+      if (error && (!data || data.length === 0)) throw error;
+
+      const sizes = [...new Set(data?.map(p => p.tamanho) || [])];
 
       // Ordenação customizada dos tamanhos do menor para o maior
       const sizeOrder = ['P', 'M', 'G', 'GG', 'XG', 'XXG', 'E1', 'E2'];
@@ -609,7 +1037,34 @@ const DashboardAdm: React.FC = () => {
 
       setUniqueSizes(sortedSizes);
     } catch (error) {
-      console.error('Erro ao buscar tamanhos:', error);
+      console.error('Erro ao buscar tamanhos únicos:', error);
+      // Fallback para dados locais
+      const sizes = [...new Set(
+        participants
+          .filter(p => p.pedido_status === 'pago' && p.tamanho && p.tamanho.trim() !== '')
+          .map(p => p.tamanho)
+      )];
+
+      // Ordenação customizada dos tamanhos do menor para o maior
+      const sizeOrder = ['P', 'M', 'G', 'GG', 'XG', 'XXG', 'E1', 'E2'];
+      const sortedSizes = sizes.sort((a, b) => {
+        const indexA = sizeOrder.indexOf(a);
+        const indexB = sizeOrder.indexOf(b);
+
+        // Se ambos estão na lista de ordenação, usar a ordem definida
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+
+        // Se apenas um está na lista, o que está na lista vem primeiro
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+
+        // Se nenhum está na lista, ordenação alfabética
+        return a.localeCompare(b);
+      });
+
+      setUniqueSizes(sortedSizes);
     }
   };
 
@@ -693,7 +1148,7 @@ const DashboardAdm: React.FC = () => {
             </div>
             <Link
               to="/"
-              className="px-4 py-2 bg-[#edbe66] text-[#0f2b45] rounded-lg hover:bg-[#d4a853] transition-colors font-medium"
+              className="px-4 py-2 bg-[#edbe66] text-[#0f2b45] rounded-full hover:bg-[#d4a853] transition-colors font-medium"
             >
               <span className="hidden sm:inline">Voltar ao Início</span>
               <span className="sm:hidden">←</span>
@@ -704,7 +1159,7 @@ const DashboardAdm: React.FC = () => {
         <div className="flex flex-row space-x-2 sm:space-x-4 mb-8">
           <button
             onClick={() => setActiveView('pedidos')}
-            className={`px-2 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-lg flex-1 sm:flex-none ${
+            className={`px-2 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-lg flex-1 sm:flex-none ${
               activeView === 'pedidos'
                 ? 'bg-[#edbe66] text-[#1a374e]'
                 : 'bg-white/10 text-white hover:bg-white/20'
@@ -715,7 +1170,7 @@ const DashboardAdm: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveView('participantes')}
-            className={`px-2 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-lg flex-1 sm:flex-none ${
+            className={`px-2 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-lg flex-1 sm:flex-none ${
               activeView === 'participantes'
                 ? 'bg-[#edbe66] text-[#1a374e]'
                 : 'bg-white/10 text-white hover:bg-white/20'
@@ -726,7 +1181,7 @@ const DashboardAdm: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveView('etiquetas')}
-            className={`px-2 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-lg flex-1 sm:flex-none ${
+            className={`px-2 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-lg flex-1 sm:flex-none ${
               activeView === 'etiquetas'
                 ? 'bg-[#edbe66] text-[#1a374e]'
                 : 'bg-white/10 text-white hover:bg-white/20'
@@ -1005,7 +1460,7 @@ const DashboardAdm: React.FC = () => {
                   <div>
                     <p className="text-white/80 text-sm font-medium">Receita Total</p>
                     <p className="text-2xl font-bold text-white">
-                      R$ {ordersData.filter(order => order.status_pedido === 'pago').reduce((sum, item) => sum + (item.valor_real_pago || item.valor_total), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      R$ {(viewStats?.receita_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                 </div>
@@ -1021,7 +1476,7 @@ const DashboardAdm: React.FC = () => {
                   <div>
                     <p className="text-white/80 text-sm font-medium">Camisetas Vendidas</p>
                     <p className="text-2xl font-bold text-white">
-                      {ordersData.filter(order => order.status_pedido === 'pago').reduce((sum, order) => sum + order.participantes.reduce((pSum, p) => pSum + p.quantidade, 0), 0)}
+                      {viewStats?.camisetas_vendidas || 0}
                     </p>
                   </div>
                 </div>
@@ -1037,7 +1492,7 @@ const DashboardAdm: React.FC = () => {
                   <div>
                     <p className="text-white/80 text-sm font-medium">Pedidos Pagos</p>
                     <p className="text-2xl font-bold text-white">
-                      {ordersData.filter(order => order.status_pedido === 'pago').length}
+                      {viewStats?.pedidos_pagos || 0}
                     </p>
                   </div>
                 </div>
@@ -1053,7 +1508,7 @@ const DashboardAdm: React.FC = () => {
                   <div>
                     <p className="text-white/80 text-sm font-medium">Pedidos Pendentes</p>
                     <p className="text-2xl font-bold text-white">
-                      {ordersData.filter(order => order.status_pedido === 'pendente').length}
+                      {viewStats?.pedidos_pendentes || 0}
                     </p>
                   </div>
                 </div>
@@ -1069,7 +1524,7 @@ const DashboardAdm: React.FC = () => {
                   <div>
                     <p className="text-white/80 text-sm font-medium">Total de Pedidos</p>
                     <p className="text-2xl font-bold text-white">
-                      {ordersData.length}
+                      {viewStats?.pedidos_total || 0}
                     </p>
                   </div>
                 </div>
@@ -1087,27 +1542,27 @@ const DashboardAdm: React.FC = () => {
                     {[
                       {
                         status: 'Pagos',
-                        count: ordersData.filter(order => order.status_pedido === 'pago').length,
-                        value: ordersData.filter(order => order.status_pedido === 'pago').reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
+                        count: viewStats?.pedidos_pagos || 0,
+                        value: viewStats?.receita_total || 0,
                         color: 'bg-green-500',
                         textColor: 'text-green-400'
                       },
                       {
                         status: 'Pendentes',
-                        count: ordersData.filter(order => order.status_pedido === 'pendente').length,
-                        value: ordersData.filter(order => order.status_pedido === 'pendente').reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
+                        count: viewStats?.pedidos_pendentes || 0,
+                        value: viewStats?.receita_pendente || 0,
                         color: 'bg-yellow-500',
                         textColor: 'text-yellow-400'
                       },
                       {
                         status: 'Cancelados',
-                        count: ordersData.filter(order => order.status_pedido === 'cancelado').length,
-                        value: ordersData.filter(order => order.status_pedido === 'cancelado').reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
+                        count: 0,
+                        value: 0,
                         color: 'bg-red-500',
                         textColor: 'text-red-400'
                       }
                     ].map((item) => {
-                      const total = ordersData.length;
+                      const total = viewStats?.pedidos_total || 1;
                       const percentage = total > 0 ? (item.count / total) * 100 : 0;
 
                       return (
@@ -1137,51 +1592,33 @@ const DashboardAdm: React.FC = () => {
                 <div className="bg-[#1a374e] rounded-xl p-6">
                   <h3 className="text-xl font-bold text-white mb-4">Métodos de Pagamento</h3>
                   <div className="space-y-4">
-                    {[
-                      {
-                        method: 'PIX',
-                        count: ordersData.filter(order => order.status_pedido === 'pago' && order.metodo_pagamento === 'pix').length,
-                        value: ordersData.filter(order => order.status_pedido === 'pago' && order.metodo_pagamento === 'pix').reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
-                        color: 'bg-emerald-500',
-                        textColor: 'text-emerald-400'
-                      },
-                      {
-                        method: 'Cartão de Crédito',
-                        count: ordersData.filter(order => order.status_pedido === 'pago' && order.metodo_pagamento === 'credit_card').length,
-                        value: ordersData.filter(order => order.status_pedido === 'pago' && order.metodo_pagamento === 'credit_card').reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
-                        color: 'bg-blue-500',
-                        textColor: 'text-blue-400'
-                      },
-                      {
-                        method: 'Cartão de Débito',
-                        count: ordersData.filter(order => order.status_pedido === 'pago' && order.metodo_pagamento === 'debit_card').length,
-                        value: ordersData.filter(order => order.status_pedido === 'pago' && order.metodo_pagamento === 'debit_card').reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
-                        color: 'bg-purple-500',
-                        textColor: 'text-purple-400'
-                      },
-                      {
-                        method: 'Boleto',
-                        count: ordersData.filter(order => order.status_pedido === 'pago' && (order.metodo_pagamento === 'ticket' || order.metodo_pagamento === 'boleto')).length,
-                        value: ordersData.filter(order => order.status_pedido === 'pago' && (order.metodo_pagamento === 'ticket' || order.metodo_pagamento === 'boleto')).reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
-                        color: 'bg-orange-500',
-                        textColor: 'text-orange-400'
-                      },
-                      {
-                        method: 'Mercado Pago',
-                        count: ordersData.filter(order => order.status_pedido === 'pago' && (order.metodo_pagamento === 'account_money' || order.metodo_pagamento === 'mercado_pago')).length,
-                        value: ordersData.filter(order => order.status_pedido === 'pago' && (order.metodo_pagamento === 'account_money' || order.metodo_pagamento === 'mercado_pago')).reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
-                        color: 'bg-cyan-500',
-                        textColor: 'text-cyan-400'
-                      },
-                      {
-                        method: 'Outros',
-                        count: ordersData.filter(order => order.status_pedido === 'pago' && (!order.metodo_pagamento || !['pix', 'credit_card', 'debit_card', 'ticket', 'boleto', 'account_money', 'mercado_pago'].includes(order.metodo_pagamento))).length,
-                        value: ordersData.filter(order => order.status_pedido === 'pago' && (!order.metodo_pagamento || !['pix', 'credit_card', 'debit_card', 'ticket', 'boleto', 'account_money', 'mercado_pago'].includes(order.metodo_pagamento))).reduce((sum, order) => sum + (order.valor_real_pago || order.valor_total), 0),
-                        color: 'bg-gray-500',
-                        textColor: 'text-gray-400'
-                      }
-                    ].map((item) => {
-                      const totalPayments = ordersData.filter(order => order.status_pedido === 'pago').length;
+                    {Object.entries(viewStats?.metodos_pagamento || {}).map(([method, data]) => {
+                      const methodNames: { [key: string]: string } = {
+                        'pix': 'PIX',
+                        'credit_card': 'Cartão de Crédito',
+                        'debit_card': 'Cartão de Débito',
+                        'ticket': 'Boleto',
+                        'boleto': 'Boleto',
+                        'account_money': 'Mercado Pago',
+                        'mercado_pago': 'Mercado Pago'
+                      };
+                      
+                      const methodColors: { [key: string]: { color: string; textColor: string } } = {
+                        'pix': { color: 'bg-emerald-500', textColor: 'text-emerald-400' },
+                        'credit_card': { color: 'bg-blue-500', textColor: 'text-blue-400' },
+                        'debit_card': { color: 'bg-purple-500', textColor: 'text-purple-400' },
+                        'ticket': { color: 'bg-orange-500', textColor: 'text-orange-400' },
+                        'boleto': { color: 'bg-orange-500', textColor: 'text-orange-400' },
+                        'account_money': { color: 'bg-cyan-500', textColor: 'text-cyan-400' },
+                        'mercado_pago': { color: 'bg-cyan-500', textColor: 'text-cyan-400' }
+                      };
+                      
+                      const displayName = methodNames[method] || method;
+                      const colors = methodColors[method] || { color: 'bg-gray-500', textColor: 'text-gray-400' };
+                      
+                      return { method: displayName, count: data.count, value: data.value, ...colors };
+                    }).map((item) => {
+                      const totalPayments = viewStats?.pedidos_pagos || 1;
                       const percentage = totalPayments > 0 ? (item.count / totalPayments) * 100 : 0;
 
                       return (
@@ -1261,7 +1698,7 @@ const DashboardAdm: React.FC = () => {
                 </div>
                 <button
                   onClick={exportOrdersData}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full font-medium transition-colors flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

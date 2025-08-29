@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { OrderService, type GroupOrderData, type Participante } from '../services/orderService';
 import { useShirtQuantityPersistence, useParticipantsPersistence } from '../hooks/useFormPersistence';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ParticipantField {
   id: string;
@@ -10,6 +11,8 @@ interface ParticipantField {
 
 const VendaLider: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { user, userData, signOut, forceLogout, loading, refreshSession } = useAuth();
+  const navigate = useNavigate();
 
   // Função para determinar o lote atual baseado na data
   const getCurrentLot = () => {
@@ -72,7 +75,7 @@ const VendaLider: React.FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   // Persistência de quantidades
   const {
     data: quantities,
@@ -175,6 +178,149 @@ const VendaLider: React.FC = () => {
       [size]: !prev[size]
     }));
   };
+
+  // Efeito para detectar logout e garantir limpeza completa
+  useEffect(() => {
+    // Se não há usuário e não está carregando, garantir que menus estejam fechados
+    if (!user && !loading) {
+      setIsUserDropdownOpen(false);
+      
+      // Verificar se há parâmetro de logout na URL
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('logout')) {
+        console.log('🔄 [VendaLider] Logout detectado via URL, limpando cache adicional...');
+        
+        // Limpar qualquer cache residual
+        try {
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              names.forEach(name => {
+                caches.delete(name);
+              });
+            });
+          }
+        } catch (cacheError) {
+          console.warn('⚠️ [VendaLider] Erro ao limpar cache:', cacheError);
+        }
+        
+        // Remover parâmetro da URL sem recarregar
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [user, loading]);
+
+  // Efeito para recuperar userData quando user existe mas userData é null
+  useEffect(() => {
+    if (user && !userData && !loading) {
+      console.log('🔄 [VendaLider] Usuário logado sem userData detectado, tentando recuperar...');
+      
+      // Tentar recuperar a sessão para recarregar userData
+      const timer = setTimeout(() => {
+        console.log('🔄 [VendaLider] Executando refreshSession para recuperar userData...');
+        refreshSession();
+      }, 1000); // Aguardar 1 segundo para evitar loops
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, userData, loading, refreshSession]);
+
+  const handleLogout = async () => {
+    console.log('🚨 [VendaLider] Iniciando logout avançado...');
+    
+    // Fechar todos os menus imediatamente
+    setIsUserDropdownOpen(false);
+    
+    try {
+      // Usar a função de logout forçado do contexto
+      await forceLogout();
+      
+      console.log('✅ [VendaLider] Logout forçado concluído');
+      
+      // Limpar cache do navegador e cookies relacionados ao Supabase
+      try {
+        // Limpar cookies do Supabase
+        document.cookie.split(';').forEach(cookie => {
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          if (name.includes('supabase') || name.includes('sb-')) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+          }
+        });
+        console.log('🍪 [VendaLider] Cookies do Supabase limpos');
+      } catch (cookieError) {
+        console.warn('⚠️ [VendaLider] Erro ao limpar cookies:', cookieError);
+      }
+      
+      // Forçar limpeza do cache do Service Worker se existir
+      if ('serviceWorker' in navigator) {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const registration of registrations) {
+            await registration.unregister();
+          }
+          console.log('🔧 [VendaLider] Service Workers limpos');
+        } catch (swError) {
+          console.warn('⚠️ [VendaLider] Erro ao limpar Service Workers:', swError);
+        }
+      }
+      
+      // Aguardar um pouco e forçar reload com cache busting
+      setTimeout(() => {
+        // Adicionar timestamp para evitar cache e forçar reload completo
+        const timestamp = Date.now();
+        const currentUrl = window.location.origin;
+        window.location.href = `${currentUrl}/?logout=${timestamp}`;
+      }, 300);
+      
+    } catch (error) {
+      console.error('❌ [VendaLider] Erro durante logout avançado:', error);
+      
+      // Fallback: limpeza manual e redirecionamento forçado
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Limpar cookies manualmente
+        document.cookie.split(';').forEach(cookie => {
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        });
+        
+        console.log('🔄 [VendaLider] Fallback: limpeza manual concluída');
+      } catch (fallbackError) {
+        console.error('❌ [VendaLider] Erro no fallback:', fallbackError);
+      }
+      
+      // Redirecionamento forçado mesmo com erro
+      setTimeout(() => {
+        const timestamp = Date.now();
+        window.location.href = `/?t=${timestamp}`;
+      }, 200);
+    }
+  };
+
+  const toggleUserDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsUserDropdownOpen(!isUserDropdownOpen);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const dropdown = document.getElementById('userProfileDropdown');
+      const icon = document.getElementById('user-profile-icon');
+      
+      if (isUserDropdownOpen && dropdown && icon && 
+          !dropdown.contains(e.target as Node) && 
+          !icon.contains(e.target as Node)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, [isUserDropdownOpen]);
 
   const getTotalQuantity = () => {
     return Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
@@ -411,7 +557,8 @@ const VendaLider: React.FC = () => {
               </Link>
             </nav>
             <button 
-              onClick={() => setShowUserDropdown(!showUserDropdown)}
+              id="user-profile-icon"
+              onClick={toggleUserDropdown}
               title="Área do Usuário" 
               className="hidden md:flex items-center justify-center w-10 h-10 border-2 border-[#edbe66] rounded-full text-[#edbe66] hover:bg-[#edbe66] hover:text-[#0f2b45] transition-all duration-300"
             >
@@ -421,22 +568,37 @@ const VendaLider: React.FC = () => {
             </button>
             
             {/* User Dropdown */}
-            {showUserDropdown && (
-              <div className="absolute top-full right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl p-4 text-[#0f2b45] transition-all duration-300 ease-out transform origin-top-right">
-                <div className="flex items-center gap-4 mb-4 border-b pb-3">
-                  <img src="https://placehold.co/100x100/0f2b45/ffffff?text=User" alt="Foto do Usuário" className="w-12 h-12 rounded-full border-2 border-[#edbe66]" />
-                  <div>
-                    <h4 className="font-bold">Nome do Líder</h4>
-                    <p className="text-gray-600 text-sm">lider@email.com</p>
+            <div 
+              id="userProfileDropdown"
+              className={`absolute top-full right-0 mt-3 w-64 bg-[#1a374e] rounded-2xl shadow-2xl p-4 text-white transition-all duration-300 ease-out transform origin-top-right z-50 ${
+                isUserDropdownOpen ? 'block' : 'hidden'
+              }`}
+            >
+              {!user ? (
+                <div className="space-y-3">
+                  <a href="/login" className="block w-full text-center px-4 py-3 bg-[#0f2b45] text-white rounded-full hover:bg-[#1a3a5a] transition font-semibold">Entrar Conta</a>
+                  <a href="/login" className="block w-full text-center px-4 py-3 border border-white text-white rounded-full hover:bg-white hover:text-[#1a374e] transition font-semibold">Criar Conta</a>
+                </div>
+              ) : (
+                <>
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 aspect-square rounded-full bg-[#edbe66] items-center justify-center text-[#0f2b45] font-bold flex-shrink-0 mx-auto mb-3 flex">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </div>
+                    <h4 className="font-bold text-center">{userData?.nome || 'Usuário'}</h4>
+                    <p className="text-white text-sm text-center">{user.email}</p>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <button className="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition">Ver Perfil</button>
-                  <Link to="/meus-pedidos" className="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition">Meus Pedidos</Link>
-                  <button className="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition text-red-600">Sair</button>
-                </div>
-              </div>
-            )}
+                  <hr className="border-gray-200 mb-4" />
+                  <div className="space-y-2">
+                    {userData?.tipo === 'admin' && (
+                      <Link to="/dashboard-adm" className="block w-full text-left px-4 py-2 rounded-full hover:bg-white/10 transition">Dashboard</Link>
+                    )}
+                    <Link to="/meus-pedidos" className="block w-full text-left px-4 py-2 rounded-full hover:bg-white/10 transition">Meus Pedidos</Link>
+                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 rounded-full hover:bg-white/10 transition text-red-400">Sair</button>
+                  </div>
+                </>
+              )}
+            </div>
             
             <button 
               onClick={() => setShowMobileMenu(!showMobileMenu)}

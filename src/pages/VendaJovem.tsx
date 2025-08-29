@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { OrderService } from '../services/orderService';
 import { useSizeSelectionPersistence } from '../hooks/useFormPersistence';
+import { useAuth } from '../contexts/AuthContext';
 
 const VendaJovem: React.FC = () => {
   // Persistência de dados do formulário
@@ -12,6 +13,9 @@ const VendaJovem: React.FC = () => {
     handleSuccessfulSubmit
   } = useSizeSelectionPersistence();
   
+  const { user, userData, signOut, forceLogout, loading, refreshSession } = useAuth();
+  const navigate = useNavigate();
+  
   const selectedSize = selectionData.selectedSize;
   const quantity = selectionData.quantity;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -19,8 +23,152 @@ const VendaJovem: React.FC = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+
+  // Efeito para detectar logout e garantir limpeza completa
+  useEffect(() => {
+    // Se não há usuário e não está carregando, garantir que menus estejam fechados
+    if (!user && !loading) {
+      setIsUserDropdownOpen(false);
+      
+      // Verificar se há parâmetro de logout na URL
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('logout')) {
+        console.log('🔄 [VendaJovem] Logout detectado via URL, limpando cache adicional...');
+        
+        // Limpar qualquer cache residual
+        try {
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              names.forEach(name => {
+                caches.delete(name);
+              });
+            });
+          }
+        } catch (cacheError) {
+          console.warn('⚠️ [VendaJovem] Erro ao limpar cache:', cacheError);
+        }
+        
+        // Remover parâmetro da URL sem recarregar
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [user, loading]);
+
+  // Efeito para recuperar userData quando user existe mas userData é null
+  useEffect(() => {
+    if (user && !userData && !loading) {
+      console.log('🔄 [VendaJovem] Usuário logado sem userData detectado, tentando recuperar...');
+      
+      // Tentar recuperar a sessão para recarregar userData
+      const timer = setTimeout(() => {
+        console.log('🔄 [VendaJovem] Executando refreshSession para recuperar userData...');
+        refreshSession();
+      }, 1000); // Aguardar 1 segundo para evitar loops
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, userData, loading, refreshSession]);
+
+  const handleLogout = async () => {
+    console.log('🚨 [VendaJovem] Iniciando logout avançado...');
+    
+    // Fechar todos os menus imediatamente
+    setIsUserDropdownOpen(false);
+    
+    try {
+      // Usar a função de logout forçado do contexto
+      await forceLogout();
+      
+      console.log('✅ [VendaJovem] Logout forçado concluído');
+      
+      // Limpar cache do navegador e cookies relacionados ao Supabase
+      try {
+        // Limpar cookies do Supabase
+        document.cookie.split(';').forEach(cookie => {
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          if (name.includes('supabase') || name.includes('sb-')) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+          }
+        });
+        console.log('🍪 [VendaJovem] Cookies do Supabase limpos');
+      } catch (cookieError) {
+        console.warn('⚠️ [VendaJovem] Erro ao limpar cookies:', cookieError);
+      }
+      
+      // Forçar limpeza do cache do Service Worker se existir
+      if ('serviceWorker' in navigator) {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const registration of registrations) {
+            await registration.unregister();
+          }
+          console.log('🔧 [VendaJovem] Service Workers limpos');
+        } catch (swError) {
+          console.warn('⚠️ [VendaJovem] Erro ao limpar Service Workers:', swError);
+        }
+      }
+      
+      // Aguardar um pouco e forçar reload com cache busting
+      setTimeout(() => {
+        // Adicionar timestamp para evitar cache e forçar reload completo
+        const timestamp = Date.now();
+        const currentUrl = window.location.origin;
+        window.location.href = `${currentUrl}/?logout=${timestamp}`;
+      }, 300);
+      
+    } catch (error) {
+      console.error('❌ [VendaJovem] Erro durante logout avançado:', error);
+      
+      // Fallback: limpeza manual e redirecionamento forçado
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Limpar cookies manualmente
+        document.cookie.split(';').forEach(cookie => {
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        });
+        
+        console.log('🔄 [VendaJovem] Fallback: limpeza manual concluída');
+      } catch (fallbackError) {
+        console.error('❌ [VendaJovem] Erro no fallback:', fallbackError);
+      }
+      
+      // Redirecionamento forçado mesmo com erro
+      setTimeout(() => {
+        const timestamp = Date.now();
+        window.location.href = `/?t=${timestamp}`;
+      }, 200);
+    }
+  };
+
+  const toggleUserDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsUserDropdownOpen(!isUserDropdownOpen);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const dropdown = document.getElementById('userProfileDropdown');
+      const icon = document.getElementById('user-profile-icon');
+      
+      if (isUserDropdownOpen && dropdown && icon && 
+          !dropdown.contains(e.target as Node) && 
+          !icon.contains(e.target as Node)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, [isUserDropdownOpen]);
 
   // Sistema de Lotes
   const getCurrentLot = () => {
@@ -253,7 +401,7 @@ const VendaJovem: React.FC = () => {
           <Link to="/" className="text-2xl font-bold text-[#edbe66]">
             UMADEPAR 2025
           </Link>
-          <div className="flex items-center">
+          <div className="flex items-center relative">
             <nav className="hidden md:flex space-x-4 items-center mr-8">
               <Link 
                 to="/meus-pedidos" 
@@ -267,6 +415,8 @@ const VendaJovem: React.FC = () => {
               </Link>
             </nav>
             <button 
+              id="user-profile-icon"
+              onClick={toggleUserDropdown}
               title="Área do Usuário" 
               className="hidden md:flex items-center justify-center w-10 h-10 border-2 border-[#edbe66] rounded-full text-[#edbe66] hover:bg-[#edbe66] hover:text-[#0f2b45] transition-all duration-300"
             >
@@ -274,6 +424,39 @@ const VendaJovem: React.FC = () => {
                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
               </svg>
             </button>
+            
+            {/* User Dropdown */}
+            <div 
+              id="userProfileDropdown"
+              className={`absolute top-full right-0 mt-3 w-64 bg-[#1a374e] rounded-2xl shadow-2xl p-4 text-white transition-all duration-300 ease-out transform origin-top-right z-50 ${
+                isUserDropdownOpen ? 'block' : 'hidden'
+              }`}
+            >
+              {!user ? (
+                <div className="space-y-3">
+                  <a href="/login" className="block w-full text-center px-4 py-3 bg-[#0f2b45] text-white rounded-full hover:bg-[#1a3a5a] transition font-semibold">Entrar Conta</a>
+                  <a href="/login" className="block w-full text-center px-4 py-3 border border-white text-white rounded-full hover:bg-white hover:text-[#1a374e] transition font-semibold">Criar Conta</a>
+                </div>
+              ) : (
+                <>
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 aspect-square rounded-full bg-[#edbe66] items-center justify-center text-[#0f2b45] font-bold flex-shrink-0 mx-auto mb-3 flex">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </div>
+                    <h4 className="font-bold text-center">{userData?.nome || 'Usuário'}</h4>
+                    <p className="text-white text-sm text-center">{user.email}</p>
+                  </div>
+                  <hr className="border-gray-200 mb-4" />
+                  <div className="space-y-2">
+                    {userData?.tipo === 'admin' && (
+                      <Link to="/dashboard-adm" className="block w-full text-left px-4 py-2 rounded-full hover:bg-white/10 transition">Dashboard</Link>
+                    )}
+                    <Link to="/meus-pedidos" className="block w-full text-left px-4 py-2 rounded-full hover:bg-white/10 transition">Meus Pedidos</Link>
+                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 rounded-full hover:bg-white/10 transition text-red-400">Sair</button>
+                  </div>
+                </>
+              )}
+            </div>
             <button 
               onClick={() => setShowMobileMenu(!showMobileMenu)}
               className="md:hidden text-gray-300 focus:outline-none"

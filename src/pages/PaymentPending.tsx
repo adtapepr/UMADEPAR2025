@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { OrderService } from '../services/orderService';
 
 interface Order {
@@ -13,9 +13,11 @@ interface Order {
 
 const PaymentPending: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(5);
 
   const paymentId = searchParams.get('payment_id');
   const externalReference = searchParams.get('external_reference');
@@ -41,6 +43,23 @@ const PaymentPending: React.FC = () => {
 
     fetchOrderDetails();
   }, [externalReference]);
+
+  // Redirecionamento automático após 5 segundos
+  useEffect(() => {
+    if (!loading && !error && order) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            navigate('/meus-pedidos');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [loading, error, order, navigate]);
 
   if (loading) {
     return (
@@ -175,13 +194,20 @@ const PaymentPending: React.FC = () => {
                 </div>
               </div>
 
+              {/* Countdown Notice */}
+              <div className="bg-yellow-50 rounded-xl p-4 mb-6 text-center">
+                <p className="text-yellow-700">
+                  Redirecionando para Meus Pedidos em <span className="font-bold">{countdown}</span> segundos...
+                </p>
+              </div>
+
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
-                  to="/"
+                  to="/meus-pedidos"
                   className="bg-[#edbe66] text-[#0f2b45] font-bold py-3 px-8 rounded-full hover:brightness-110 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
-                  Voltar ao Início
+                  Ver Meus Pedidos
                 </Link>
                 <button 
                   onClick={() => window.location.reload()}
