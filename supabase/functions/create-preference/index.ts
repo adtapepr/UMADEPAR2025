@@ -215,6 +215,17 @@ serve(async (req) => {
       auto_return: 'approved',
     };
 
+    // Log das credenciais (mascaradas para segurança)
+    const mpAccessToken = Deno.env.get('MP_ACCESS_TOKEN');
+    console.log('🔑 [create-preference] Verificando credenciais:', {
+      request_id: requestId,
+      order_id: orderId,
+      mp_access_token_exists: !!mpAccessToken,
+      mp_access_token_prefix: mpAccessToken ? mpAccessToken.substring(0, 8) + '...' : 'undefined',
+      mp_access_token_length: mpAccessToken ? mpAccessToken.length : 0,
+      timestamp: new Date().toISOString()
+    });
+
     console.log('💳 [create-preference] Criando preferência no Mercado Pago:', {
       request_id: requestId,
       order_id: orderId,
@@ -231,7 +242,9 @@ serve(async (req) => {
           last_name: preference.payer.last_name,
           email: preference.payer.email
         },
-        external_reference: preference.external_reference
+        external_reference: preference.external_reference,
+        back_urls: preference.back_urls,
+        notification_url: preference.notification_url
       },
       timestamp: new Date().toISOString()
     });
@@ -240,10 +253,19 @@ serve(async (req) => {
     const mpResponse = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('MP_ACCESS_TOKEN')}`,
+        'Authorization': `Bearer ${mpAccessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(preference),
+    });
+
+    console.log('📡 [create-preference] Resposta da API do Mercado Pago:', {
+      request_id: requestId,
+      order_id: orderId,
+      status: mpResponse.status,
+      statusText: mpResponse.statusText,
+      headers: Object.fromEntries(mpResponse.headers.entries()),
+      timestamp: new Date().toISOString()
     });
 
     if (!mpResponse.ok) {
@@ -274,6 +296,8 @@ serve(async (req) => {
       order_id: orderId,
       preference_id: mpPreference.id,
       init_point: mpPreference.init_point,
+      sandbox_init_point: mpPreference.sandbox_init_point,
+      full_response: mpPreference,
       timestamp: new Date().toISOString()
     });
 

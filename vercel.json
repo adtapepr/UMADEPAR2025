@@ -23,6 +23,11 @@
   ],
   "env": {
     "VITE_SUPABASE_URL": "https://bwrgpdlxhudtyewlmscl.supabase.co",
-    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3cmdwZGx4aHVkdHlld2xtc2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MDQ4MzgsImV4cCI6MjA3MTQ4MDgzOH0.F7A9v81dtsHW3vrZ92ltsTYXFtwCSoHvaRCatW1HTPE"
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3cmdwZGx4aHVkdHlld2xtc2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5NjE5NzIsImV4cCI6MjA1MjUzNzk3Mn0.Ej8Uy8Ey5Ej8Uy8Ey5Ej8Uy8Ey5Ej8Uy8Ey5Ej8Uy8",
+    "VITE_SITE_URL": "https://umadepar2025.vercel.app",
+    "VITE_MP_PUBLIC_KEY": "APP_USR-0759f29f-f9f0-4ca6-b2c5-44da1da5648f",
+    "VITE_SENTRY_DSN": "",
+    "VITE_ENVIRONMENT": "production",
+    "VITE_APP_VERSION": "1.0.0"
   }
 }

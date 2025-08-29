@@ -608,13 +608,25 @@ export class OrderService {
       const preference = await this.createPaymentPreference(orderId);
       
       // 3. Retorna a URL de pagamento
-      const isProduction = import.meta.env.PROD;
+      const viteEnvironment = import.meta.env.VITE_ENVIRONMENT;
+      const isProduction = viteEnvironment === 'production';
       const paymentUrl = isProduction ? preference.init_point : preference.sandbox_init_point;
+      
+      console.log('🔍 [OrderService] Debug Environment Variables:', {
+        VITE_ENVIRONMENT: viteEnvironment,
+        is_production: isProduction,
+        has_init_point: !!preference.init_point,
+        has_sandbox_init_point: !!preference.sandbox_init_point,
+        init_point: preference.init_point,
+        sandbox_init_point: preference.sandbox_init_point,
+        selected_url: paymentUrl
+      });
       
       console.log('✅ [OrderService] Fluxo de pedido em grupo concluído com sucesso:', {
         order_id: orderId,
         payment_url: paymentUrl,
         is_production: isProduction,
+        environment: viteEnvironment,
         timestamp: new Date().toISOString()
       });
       
@@ -656,13 +668,25 @@ export class OrderService {
       const preference = await this.createPaymentPreference(order.id);
       
       // 3. Retorna a URL de pagamento
-      const isProduction = import.meta.env.PROD;
+      const viteEnvironment = import.meta.env.VITE_ENVIRONMENT;
+      const isProduction = viteEnvironment === 'production';
       const paymentUrl = isProduction ? preference.init_point : preference.sandbox_init_point;
+      
+      console.log('🔍 [OrderService] Debug Environment Variables:', {
+        VITE_ENVIRONMENT: viteEnvironment,
+        is_production: isProduction,
+        has_init_point: !!preference.init_point,
+        has_sandbox_init_point: !!preference.sandbox_init_point,
+        init_point: preference.init_point,
+        sandbox_init_point: preference.sandbox_init_point,
+        selected_url: paymentUrl
+      });
       
       console.log('✅ [OrderService] Fluxo de pagamento concluído com sucesso:', {
         order_id: order.id,
         payment_url: paymentUrl,
         is_production: isProduction,
+        environment: viteEnvironment,
         timestamp: new Date().toISOString()
       });
       

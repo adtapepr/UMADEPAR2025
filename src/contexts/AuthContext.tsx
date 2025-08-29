@@ -120,6 +120,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       retryCountRef.current = 0; // Reset retry count on success
       
       const userData = data as UserData;
+      
+      // Sincronizar metadados do usuário no JWT
+      try {
+        console.log('🔄 [Auth] Sincronizando metadados do usuário no JWT...');
+        const { error: rpcError } = await supabase.rpc('sync_user_metadata');
+        if (rpcError) {
+          console.warn('⚠️ [Auth] Erro ao sincronizar metadados:', rpcError);
+        } else {
+          console.log('✅ [Auth] Metadados sincronizados com sucesso');
+        }
+      } catch (syncError) {
+        console.warn('⚠️ [Auth] Erro inesperado ao sincronizar metadados:', syncError);
+      }
+      
       // Salvar no localStorage para persistência
       saveUserDataToStorage(userData);
       

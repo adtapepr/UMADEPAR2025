@@ -33,7 +33,7 @@ const VendaJovem: React.FC = () => {
       return {
         number: 1,
         name: '1º Lote - Promoção Especial',
-        price: 35.00,
+        price: 2.00,
         description: 'Válido até 31 de outubro de 2025',
         status: 'active',
         color: 'from-green-500 to-green-600',
@@ -74,7 +74,7 @@ const VendaJovem: React.FC = () => {
     {
       number: 1,
       name: '1º Lote - Promoção Especial',
-      price: 35.00,
+      price:2.00,
       description: 'Até 31/10/2025',
       status: currentLot.number === 1 ? 'active' : currentLot.number > 1 ? 'expired' : 'upcoming',
       color: 'from-green-500 to-green-600',
