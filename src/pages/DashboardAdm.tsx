@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../services/orderService';
 import { useAuth } from '../contexts/AuthContext';
@@ -430,23 +430,37 @@ const DashboardAdm: React.FC = () => {
         throw new Error('Acesso negado. Apenas administradores podem acessar esta página.');
       }
       
+      console.log('🔍 Tentando buscar da view vw_participantes_completo...');
+      
       // Tentar buscar da view primeiro
       let { data, error } = await supabase
         .from('vw_participantes_completo')
         .select('*')
         .order('created_at', { ascending: false });
 
+      console.log('📊 Dados da view:', data?.length || 0, 'registros');
+
       // Se a view não retornar dados, buscar das tabelas base
       if (!data || data.length === 0) {
-        console.log('View vazia, buscando das tabelas base...');
+        console.log('⚠️ View vazia ou inexistente, buscando das tabelas base...');
+        
+        // CORREÇÃO: Busca correta considerando a estrutura real das tabelas
         const { data: participantesData, error: participantesError } = await supabase
           .from('participantes')
           .select(`
-            *,
+            id,
+            nome,
+            tamanho,
+            telefone,
+            cidade,
+            igreja,
+            observacoes,
+            created_at,
+            user_id,
+            item_pedido_id,
             itens_pedido!inner(
               id,
               pedido_id,
-              tamanho,
               quantidade,
               preco_unitario,
               pedidos!inner(
@@ -457,6 +471,7 @@ const DashboardAdm: React.FC = () => {
                 status,
                 created_at,
                 updated_at,
+                mp_transaction_amount,
                 users!inner(
                   id,
                   nome,
@@ -468,14 +483,17 @@ const DashboardAdm: React.FC = () => {
           `);
 
         if (participantesError) {
+          console.error('❌ Erro ao buscar participantes:', participantesError);
           throw participantesError;
         }
+
+        console.log('✅ Dados das tabelas base:', participantesData?.length || 0, 'registros');
 
         // Transformar dados para o formato esperado
         data = (participantesData || []).map((p: any) => ({
           id: p.id,
           nome: p.nome,
-          tamanho: p.itens_pedido.tamanho,
+          tamanho: p.tamanho, // ✅ CORREÇÃO: tamanho vem diretamente de participantes
           telefone: p.telefone,
           cidade: p.cidade,
           igreja: p.igreja,
@@ -486,16 +504,20 @@ const DashboardAdm: React.FC = () => {
           comprador_tipo: p.itens_pedido.pedidos.users.tipo,
           pedido_id: p.itens_pedido.pedido_id,
           pedido_status: p.itens_pedido.pedidos.status,
-          pedido_valor: p.itens_pedido.pedidos.valor_total,
+          pedido_valor: parseFloat(p.itens_pedido.pedidos.valor_total),
           item_quantidade: p.itens_pedido.quantidade,
-          item_preco: p.itens_pedido.preco_unitario,
-          valor_real_pago: p.itens_pedido.pedidos.valor_total
+          item_preco: parseFloat(p.itens_pedido.preco_unitario),
+          valor_real_pago: p.itens_pedido.pedidos.mp_transaction_amount 
+            ? parseFloat(p.itens_pedido.pedidos.mp_transaction_amount) 
+            : parseFloat(p.itens_pedido.pedidos.valor_total)
         }));
       }
 
+      console.log('✅ Dados finais processados:', data?.length || 0, 'participantes');
       setParticipants(data || []);
       await fetchOrdersData(data || []);
     } catch (err: any) {
+      console.error('❌ Erro geral:', err);
       setError(err.message);
       await fetchOrdersData([]);
     } finally {
@@ -875,14 +897,6 @@ const DashboardAdm: React.FC = () => {
     fetchParticipants();
   }, []);
 
-  // Atualizar filtros quando os dados dos participantes mudarem
-  useEffect(() => {
-    if (participants.length > 0) {
-      fetchUniqueCities();
-      fetchUniqueSizes();
-    }
-  }, [participants]);
-
   const calculateStats = (participants: Participant[], pedidos: any[] = []) => {
     // Usar dados das views se disponíveis, senão usar cálculo local
     if (viewStats) {
@@ -921,156 +935,38 @@ const DashboardAdm: React.FC = () => {
     };
   };
 
-  // Estados para dados de filtros
-  const [uniqueCities, setUniqueCities] = useState<string[]>([]);
-  const [uniqueSizes, setUniqueSizes] = useState<string[]>([]);
+  // Calcular cidades únicas em memória usando useMemo
+  const uniqueCities = useMemo(() => {
+    const cities = [...new Set(
+      participants
+        .filter(p => p.pedido_status === 'pago' && p.cidade && p.cidade.trim() !== '')
+        .map(p => p.cidade)
+    )].sort();
+    return cities;
+  }, [participants]);
 
-  // Função otimizada para buscar cidades únicas das views
-  const fetchUniqueCities = async () => {
-    try {
-      let { data, error } = await supabase
-        .from('vw_participantes_completo')
-        .select('cidade')
-        .eq('pedido_status', 'pago')
-        .not('cidade', 'is', null)
-        .neq('cidade', '');
+  // Calcular tamanhos únicos em memória usando useMemo
+  const uniqueSizes = useMemo(() => {
+    const sizes = [...new Set(
+      participants
+        .filter(p => p.pedido_status === 'pago' && p.tamanho && p.tamanho.trim() !== '')
+        .map(p => p.tamanho)
+    )];
+    
+    const sizeOrder = ['P', 'M', 'G', 'GG', 'XG', 'XXG', 'E1', 'E2'];
+    const sortedSizes = sizes.sort((a, b) => {
+      const indexA = sizeOrder.indexOf(a);
+      const indexB = sizeOrder.indexOf(b);
+      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+      return a.localeCompare(b);
+    });
 
-      // Se a view não retornar dados, buscar das tabelas base
-      if (!data || data.length === 0) {
-        console.log('View de participantes vazia, buscando cidades das tabelas base...');
-        const { data: participantesData, error: participantesError } = await supabase
-          .from('participantes')
-          .select(`
-            cidade,
-            itens_pedido!inner(
-              pedidos!inner(
-                status
-              )
-            )
-          `)
-          .eq('itens_pedido.pedidos.status', 'pago')
-          .not('cidade', 'is', null)
-          .neq('cidade', '');
+    return sortedSizes;
+  }, [participants]);
 
-        if (participantesError) {
-          throw participantesError;
-        }
 
-        data = participantesData;
-      }
-
-      if (error && (!data || data.length === 0)) throw error;
-
-      const cities = [...new Set(data?.map(p => p.cidade) || [])].sort();
-      setUniqueCities(cities);
-    } catch (error) {
-      console.error('Erro ao buscar cidades únicas:', error);
-      // Fallback para dados locais
-      const cities = [...new Set(
-        participants
-          .filter(p => p.pedido_status === 'pago' && p.cidade && p.cidade.trim() !== '')
-          .map(p => p.cidade)
-      )].sort();
-      setUniqueCities(cities);
-    }
-  };
-
-  // Função otimizada para buscar tamanhos únicos das views
-  const fetchUniqueSizes = async () => {
-    try {
-      let { data, error } = await supabase
-        .from('vw_participantes_completo')
-        .select('tamanho')
-        .eq('pedido_status', 'pago')
-        .not('tamanho', 'is', null)
-        .neq('tamanho', '');
-
-      // Se a view não retornar dados, buscar das tabelas base
-      if (!data || data.length === 0) {
-        console.log('View de participantes vazia, buscando tamanhos das tabelas base...');
-        const { data: participantesData, error: participantesError } = await supabase
-          .from('participantes')
-          .select(`
-            itens_pedido!inner(
-              tamanho,
-              pedidos!inner(
-                status
-              )
-            )
-          `)
-          .eq('itens_pedido.pedidos.status', 'pago')
-          .not('itens_pedido.tamanho', 'is', null)
-          .neq('itens_pedido.tamanho', '');
-
-        if (participantesError) {
-          throw participantesError;
-        }
-
-        // Transformar dados para o formato esperado
-        data = participantesData?.map((p: any) => ({
-          tamanho: p.itens_pedido.tamanho
-        })) || [];
-      }
-
-      if (error && (!data || data.length === 0)) throw error;
-
-      const sizes = [...new Set(data?.map(p => p.tamanho) || [])];
-
-      // Ordenação customizada dos tamanhos do menor para o maior
-      const sizeOrder = ['P', 'M', 'G', 'GG', 'XG', 'XXG', 'E1', 'E2'];
-      const sortedSizes = sizes.sort((a, b) => {
-        const indexA = sizeOrder.indexOf(a);
-        const indexB = sizeOrder.indexOf(b);
-
-        // Se ambos estão na lista de ordenação, usar a ordem definida
-        if (indexA !== -1 && indexB !== -1) {
-          return indexA - indexB;
-        }
-
-        // Se apenas um está na lista, o que está na lista vem primeiro
-        if (indexA !== -1) return -1;
-        if (indexB !== -1) return 1;
-
-        // Se nenhum está na lista, ordenação alfabética
-        return a.localeCompare(b);
-      });
-
-      setUniqueSizes(sortedSizes);
-    } catch (error) {
-      console.error('Erro ao buscar tamanhos únicos:', error);
-      // Fallback para dados locais
-      const sizes = [...new Set(
-        participants
-          .filter(p => p.pedido_status === 'pago' && p.tamanho && p.tamanho.trim() !== '')
-          .map(p => p.tamanho)
-      )];
-
-      // Ordenação customizada dos tamanhos do menor para o maior
-      const sizeOrder = ['P', 'M', 'G', 'GG', 'XG', 'XXG', 'E1', 'E2'];
-      const sortedSizes = sizes.sort((a, b) => {
-        const indexA = sizeOrder.indexOf(a);
-        const indexB = sizeOrder.indexOf(b);
-
-        // Se ambos estão na lista de ordenação, usar a ordem definida
-        if (indexA !== -1 && indexB !== -1) {
-          return indexA - indexB;
-        }
-
-        // Se apenas um está na lista, o que está na lista vem primeiro
-        if (indexA !== -1) return -1;
-        if (indexB !== -1) return 1;
-
-        // Se nenhum está na lista, ordenação alfabética
-        return a.localeCompare(b);
-      });
-
-      setUniqueSizes(sortedSizes);
-    }
-  };
-
-  // Funções para filtros (mantidas para compatibilidade)
-  const getUniqueCities = () => uniqueCities;
-  const getUniqueSizes = () => uniqueSizes;
 
   const getFilteredParticipants = () => {
     return participants.filter(participant => {
@@ -1219,7 +1115,7 @@ const DashboardAdm: React.FC = () => {
                     onChange={setSelectedCity}
                     options={[
                       { value: '', label: 'Todas as cidades' },
-                      ...getUniqueCities().map(city => ({ value: city, label: city }))
+                      ...uniqueCities.map(city => ({ value: city, label: city }))
                     ]}
                     placeholder="Todas as cidades"
                   />
@@ -1233,7 +1129,7 @@ const DashboardAdm: React.FC = () => {
                     onChange={setSelectedSize}
                     options={[
                       { value: '', label: 'Todos os tamanhos' },
-                      ...getUniqueSizes().map(size => ({ value: size, label: size }))
+                      ...uniqueSizes.map(size => ({ value: size, label: size }))
                     ]}
                     placeholder="Todos os tamanhos"
                   />
@@ -1327,7 +1223,7 @@ const DashboardAdm: React.FC = () => {
                     onChange={setSelectedCity}
                     options={[
                       { value: '', label: 'Todas as cidades' },
-                      ...getUniqueCities().map(city => ({ value: city, label: city }))
+                      ...uniqueCities.map(city => ({ value: city, label: city }))
                     ]}
                     placeholder="Todas as cidades"
                   />
@@ -1341,7 +1237,7 @@ const DashboardAdm: React.FC = () => {
                     onChange={setSelectedSize}
                     options={[
                       { value: '', label: 'Todos os tamanhos' },
-                      ...getUniqueSizes().map(size => ({ value: size, label: size }))
+                      ...uniqueSizes.map(size => ({ value: size, label: size }))
                     ]}
                     placeholder="Todos os tamanhos"
                   />

@@ -4,6 +4,7 @@ import Login from "@/pages/Login";
 import VendaJovem from "@/pages/VendaJovem";
 import VendaLider from "@/pages/VendaLider";
 import DashboardAdm from "@/pages/DashboardAdm";
+import PainelControle from "@/pages/PainelControle";
 import MeusPedidos from "@/pages/MeusPedidos";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentPending from "@/pages/PaymentPending";
@@ -48,6 +49,13 @@ function AppContent() {
               <ProtectedRoute>
                 <RoleProtectedRoute allowedRoles={['admin']}>
                   <DashboardAdm />
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            } />
+            <Route path="/painel-controle" element={
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <PainelControle />
                 </RoleProtectedRoute>
               </ProtectedRoute>
             } />
