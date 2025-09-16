@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Venda (Líder) - UMADEPAR 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Swiper.js para o carrossel -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f2b45;
+            color: #d9d9d9;
+        }
+        .bg-dark-blue { background-color: #0f2b45; }
+        .bg-light-gray { background-color: #d9d9d9; }
+        .bg-gold { background-color: #edbe66; }
+        .text-dark-blue { color: #0f2b45; }
+        .text-light-gray { color: #d9d9d9; }
+        .text-gold { color: #edbe66; }
+        .border-gold { border-color: #edbe66; }
+        .ring-gold { --tw-ring-color: #edbe66; }
+        .btn-primary {
+            background-color: #edbe66;
+            color: #0f2b45;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(237, 190, 102, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(237, 190, 102, 0.4);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #edbe66;
+            border: 2px solid #edbe66;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #edbe66;
+            color: #0f2b45;
+        }
+        /* Estilos do Swiper */
+        .product-carousel {
+            aspect-ratio: 1 / 1;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #edbe66;
+        }
+        .swiper-pagination-bullet-active {
+            background: #edbe66;
+        }
+    </style>
+</head>
+<body class="antialiased bg-light-gray">
+
+    <!-- Cabeçalho e Navegação -->
+    <header id="header" class="bg-dark-blue/80 backdrop-blur-lg sticky top-0 left-0 right-0 z-40 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-gold">UMADEPAR 2025</a>
+            <div class="flex items-center relative">
+                <nav class="hidden md:flex space-x-8 items-center mr-8">
+                    <a href="index.html" class="btn-secondary font-bold py-2 px-6 rounded-full">Voltar</a>
+                </nav>
+                <button id="user-profile-icon" title="Área do Usuário" class="hidden md:flex items-center justify-center w-10 h-10 border-2 border-gold rounded-full text-gold hover:bg-gold hover:text-dark-blue transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
+                </button>
+                <!-- Dropdown do Usuário -->
+                <div id="userProfileDropdown" class="absolute top-full right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl p-4 text-dark-blue hidden transition-all duration-300 ease-out transform origin-top-right">
+                    <div class="flex items-center gap-4 mb-4 border-b pb-3">
+                        <img src="https://placehold.co/100x100/0f2b45/ffffff?text=User" alt="Foto do Usuário" class="w-12 h-12 rounded-full border-2 border-gold">
+                        <div>
+                            <h4 class="font-bold">Nome do Líder</h4>
+                            <p class="text-gray-600 text-sm">lider@email.com</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="#" class="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition">Ver Perfil</a>
+                        <a href="#" class="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition text-red-600">Sair</a>
+                    </div>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-light-gray focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="index.html" class="block mt-4 w-full text-center btn-secondary font-bold py-2 px-6 rounded-full">Voltar</a>
+             <a href="#" id="mobile-user-profile-link" class="block mt-4 w-full text-center border-2 border-gold text-gold font-bold py-2 px-6 rounded-full">Área do Usuário</a>
+        </div>
+    </header>
+
+    <main class="text-dark-blue">
+        <section id="venda" class="py-12 md:py-20">
+            <div class="container mx-auto px-6">
+                <div class="bg-white p-6 md:p-10 rounded-2xl shadow-2xl grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+                    <!-- Coluna da Esquerda: Carrossel de Imagens -->
+                    <div class="w-full" data-aos="fade-right">
+                        <div class="swiper product-carousel rounded-lg overflow-hidden">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide"><img src="https://placehold.co/600x600/0f2b45/ffffff?text=Frente" alt="Produto - Frente" class="w-full h-full object-cover"></div>
+                                <div class="swiper-slide"><img src="https://placehold.co/600x600/0f2b45/ffffff?text=Costas" alt="Produto - Costas" class="w-full h-full object-cover"></div>
+                                <div class="swiper-slide"><img src="https://placehold.co/600x600/edbe66/0f2b45?text=Detalhe" alt="Produto - Detalhe" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna da Direita: Detalhes e Compra -->
+                    <div class="flex flex-col h-full" data-aos="fade-left">
+                        <h1 class="text-3xl lg:text-4xl font-bold mb-3">Pedido do Grupo</h1>
+                        <p class="text-3xl font-bold text-gold mb-4">R$ 79,90 <span class="text-lg text-gray-600 font-normal">por camiseta</span></p>
+                        <p class="mb-6 text-gray-600">Selecione as quantidades para cada tamanho e informe os nomes dos participantes.</p>
+                        
+                        <div id="leader-purchase-form" class="flex-grow space-y-5">
+                            <!-- Gerado dinamicamente pelo JS -->
+                        </div>
+                        
+                        <div class="mt-auto pt-6">
+                             <a href="#" id="size-guide-link" class="text-sm text-gray-600 hover:text-dark-blue underline inline-flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Guia de tamanhos
+                            </a>
+                            <button id="buy-button" class="btn-primary w-full font-bold py-4 px-10 rounded-full text-lg mt-4">
+                                Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-dark-blue border-t border-gold/20 py-12">
+        <div class="container mx-auto px-6 text-center text-light-gray">
+            <p class="font-bold text-xl mb-2 text-gold">UMADEPAR 2025</p>
+            <p>&copy; 2025 União da Mocidade da Assembleia de Deus no Estado do Paraná. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Modals (exceto o de perfil que agora é um dropdown) -->
+    <div id="sizeGuideModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white text-dark-blue p-8 rounded-2xl shadow-2xl w-full max-w-lg relative" data-aos="zoom-in">
+            <button onclick="closeModal('sizeGuideModal')" class="absolute top-4 right-4 text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
+            <h4 class="text-2xl font-bold mb-6 text-center">Guia de Tamanhos</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left"><thead><tr class="border-b"><th class="p-2 font-bold">Tamanho</th><th class="p-2 font-bold">Largura (cm)</th><th class="p-2 font-bold">Altura (cm)</th></tr></thead><tbody><tr class="border-b"><td class="p-2">P</td><td class="p-2">50</td><td class="p-2">68</td></tr><tr class="border-b"><td class="p-2">M</td><td class="p-2">52</td><td class="p-2">70</td></tr><tr class="border-b"><td class="p-2">G</td><td class="p-2">54</td><td class="p-2">72</td></tr><tr class="border-b"><td class="p-2">GG</td><td class="p-2">56</td><td class="p-2">74</td></tr><tr><td class="p-2">XG</td><td class="p-2">58</td><td class="p-2">76</td></tr></tbody></table>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">*Medidas aproximadas. Pode haver variação de até 2cm.</p>
+        </div>
+    </div>
+    <div id="paymentModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white text-dark-blue p-8 rounded-2xl shadow-2xl w-full max-w-md relative" data-aos="zoom-in">
+            <button onclick="closeModal('paymentModal')" class="absolute top-4 right-4 text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
+            <h4 class="text-2xl font-bold mb-6 text-center">Informações de Pagamento</h4>
+            <form id="checkout-form">
+                <div class="mb-4"><label for="name" class="block font-bold mb-2">Nome Completo do Líder</label><input type="text" id="name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required></div>
+                <div class="mb-4"><label for="email" class="block font-bold mb-2">E-mail</label><input type="email" id="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required></div>
+                <div class="mb-4"><label for="card" class="block font-bold mb-2">Número do Cartão</label><input type="text" id="card" placeholder="0000 0000 0000 0000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required></div>
+                <div class="grid grid-cols-2 gap-4 mb-6"><div><label for="expiry" class="block font-bold mb-2">Validade</label><input type="text" id="expiry" placeholder="MM/AA" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required></div><div><label for="cvc" class="block font-bold mb-2">CVC</label><input type="text" id="cvc" placeholder="123" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ring-gold" required></div></div>
+                <button type="submit" class="btn-primary w-full font-bold py-4 px-10 rounded-full text-lg">Finalizar Compra</button>
+            </form>
+        </div>
+    </div>
+    <div id="successModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white text-dark-blue p-8 rounded-2xl shadow-2xl text-center max-w-sm" data-aos="zoom-in">
+            <h3 class="text-2xl font-bold mb-4 text-gold">Compra Realizada!</h3>
+            <p class="mb-6">Obrigado! Você receberá um e-mail de confirmação em breve.</p>
+            <button onclick="closeModal('successModal')" class="btn-primary font-bold py-2 px-8 rounded-full">Fechar</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        // Inicializa bibliotecas
+        AOS.init({ duration: 800, once: true });
+        const swiper = new Swiper('.swiper.product-carousel', {
+            loop: true,
+            pagination: { el: '.swiper-pagination', clickable: true },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        });
+
+        // Lógica do Menu Mobile
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Lógica do Formulário de Líder
+        const sizes = ['P', 'M', 'G', 'GG', 'XG'];
+        const formContainer = document.getElementById('leader-purchase-form');
+
+        sizes.forEach(size => {
+            const entry = document.createElement('div');
+            entry.className = 'size-entry border-t pt-4';
+            entry.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-xl">Tamanho ${size}</span>
+                        <button class="toggle-participants-btn p-1 rounded-full hover:bg-gray-200 hidden" data-size="${size}" title="Mostrar/Ocultar nomes">
+                            <svg class="w-5 h-5 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center">
+                        <button class="quantity-btn border-2 rounded-md p-2 px-4 font-bold text-xl" data-size="${size}" data-action="minus">-</button>
+                        <input type="number" value="0" min="0" class="quantity-input w-16 text-center text-lg font-bold border-t-2 border-b-2 h-full" data-size="${size}" readonly>
+                        <button class="quantity-btn border-2 rounded-md p-2 px-4 font-bold text-xl" data-size="${size}" data-action="plus">+</button>
+                    </div>
+                </div>
+                <div id="participants-${size}" class="mt-3 space-y-2 hidden"></div>
+            `;
+            formContainer.appendChild(entry);
+        });
+
+        formContainer.addEventListener('click', (e) => {
+            const quantityBtn = e.target.closest('.quantity-btn');
+            const toggleBtn = e.target.closest('.toggle-participants-btn');
+
+            if (quantityBtn) {
+                const action = quantityBtn.dataset.action;
+                const size = quantityBtn.dataset.size;
+                const input = formContainer.querySelector(`.quantity-input[data-size="${size}"]`);
+                let currentValue = parseInt(input.value);
+
+                if (action === 'plus') currentValue++;
+                else if (action === 'minus' && currentValue > 0) currentValue--;
+                
+                input.value = currentValue;
+                updateParticipantFields(size, currentValue);
+            }
+
+            if (toggleBtn) {
+                const size = toggleBtn.dataset.size;
+                const container = document.getElementById(`participants-${size}`);
+                const icon = toggleBtn.querySelector('svg');
+                container.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            }
+        });
+
+        function updateParticipantFields(size, quantity) {
+            const container = document.getElementById(`participants-${size}`);
+            const toggleBtn = formContainer.querySelector(`.toggle-participants-btn[data-size="${size}"]`);
+            container.innerHTML = ''; 
+
+            if (quantity > 0) {
+                toggleBtn.classList.remove('hidden');
+                container.classList.add('pt-3', 'border-t', 'mt-3');
+            } else {
+                toggleBtn.classList.add('hidden');
+                container.classList.add('hidden');
+                container.classList.remove('pt-3', 'border-t', 'mt-3');
+            }
+
+            for (let i = 1; i <= quantity; i++) {
+                const inputWrapper = document.createElement('div');
+                inputWrapper.innerHTML = `<input type="text" placeholder="Nome do Participante ${i} - Tamanho ${size}" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 ring-gold" required>`;
+                container.appendChild(inputWrapper);
+            }
+        }
+
+        // Lógica dos Modals
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.getElementById(modalId).classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Lógica do Dropdown de Perfil
+        const userProfileIcon = document.getElementById('user-profile-icon');
+        const userProfileDropdown = document.getElementById('userProfileDropdown');
+        const mobileUserProfileLink = document.getElementById('mobile-user-profile-link');
+
+        userProfileIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userProfileDropdown.classList.toggle('hidden');
+        });
+        
+        mobileUserProfileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // No mobile, vamos usar um modal normal para melhor experiência
+            openModal('userProfileModal'); 
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!userProfileDropdown.classList.contains('hidden') && !userProfileDropdown.contains(e.target) && !userProfileIcon.contains(e.target)) {
+                userProfileDropdown.classList.add('hidden');
+            }
+        });
+
+        // Listeners para abrir outros modals
+        document.getElementById('size-guide-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('sizeGuideModal');
+        });
+
+        document.getElementById('buy-button').addEventListener('click', () => {
+            let totalQuantity = 0;
+            document.querySelectorAll('.quantity-input').forEach(input => totalQuantity += parseInt(input.value));
+
+            if (totalQuantity === 0) {
+                alert('Por favor, adicione pelo menos uma camiseta.');
+                return;
+            }
+            
+            let allNamesFilled = true;
+            document.querySelectorAll('#leader-purchase-form input[type="text"]').forEach(input => {
+                if (!input.value.trim()) allNamesFilled = false;
+            });
+
+            if (!allNamesFilled) {
+                alert('Por favor, preencha o nome de todos os participantes.');
+                return;
+            }
+
+            openModal('paymentModal');
+        });
+
+        document.getElementById('checkout-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            closeModal('paymentModal');
+            openModal('successModal');
+        });
+    </script>
+</body>
+</html>

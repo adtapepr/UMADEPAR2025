@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMADEPAR 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f2b45;
+            color: #d9d9d9;
+        }
+        .bg-dark-blue { background-color: #0f2b45; }
+        .bg-light-gray { background-color: #d9d9d9; }
+        .bg-gold { background-color: #edbe66; }
+        .text-dark-blue { color: #0f2b45; }
+        .text-light-gray { color: #d9d9d9; }
+        .text-gold { color: #edbe66; }
+        .border-gold { border-color: #edbe66; }
+        .ring-gold { --tw-ring-color: #edbe66; }
+        .btn-primary {
+            background-color: #edbe66;
+            color: #0f2b45;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(237, 190, 102, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(237, 190, 102, 0.4);
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+        /* Estilos para a imagem de fundo da seção Hero */
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://adcascavel.com.br/fotos/g_20181016_153031_77.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4; /* Opacidade de 40% */
+            mix-blend-mode: multiply; /* Modo de mesclagem */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Cabeçalho e Navegação -->
+    <header id="header" class="bg-dark-blue/80 backdrop-blur-lg fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gold">UMADEPAR 2025</h1>
+            <div class="flex items-center">
+                <nav class="hidden md:flex space-x-8 items-center mr-8">
+                    <a href="#sobre" class="text-light-gray hover:text-gold transition">Sobre</a>
+                    <a href="#lideres" class="text-light-gray hover:text-gold transition">Líderes</a>
+                    <a href="#camisetas" class="text-light-gray hover:text-gold transition">Camisetas</a>
+                    <a href="#fotos" class="text-light-gray hover:text-gold transition">Fotos</a>
+                    <a href="venda.html" class="btn-primary font-bold py-2 px-6 rounded-full">Comprar Agora</a>
+                </nav>
+                <div class="relative">
+                    <button id="user-profile-icon" title="Área do Usuário" class="hidden md:flex items-center justify-center w-10 h-10 border-2 border-gold rounded-full text-gold hover:bg-gold hover:text-dark-blue transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <!-- Dropdown do Usuário -->
+                    <div id="userProfileDropdown" class="absolute top-full right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl p-4 text-dark-blue hidden transition-all duration-300 ease-out transform origin-top-right">
+                        <div class="flex items-center gap-4 mb-4 border-b pb-3">
+                            <img src="https://placehold.co/100x100/0f2b45/ffffff?text=User" alt="Foto do Usuário" class="w-12 h-12 rounded-full border-2 border-gold">
+                            <div>
+                                <h4 class="font-bold">Nome do Usuário</h4>
+                                <p class="text-gray-600 text-sm">usuario@email.com</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="#" class="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition">Ver Perfil</a>
+                            <a href="login.html" class="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition text-red-600">Sair</a>
+                        </div>
+                    </div>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-light-gray focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#sobre" class="block py-2 text-light-gray hover:text-gold transition">Sobre</a>
+            <a href="#lideres" class="block py-2 text-light-gray hover:text-gold transition">Líderes</a>
+            <a href="#camisetas" class="block py-2 text-light-gray hover:text-gold transition">Camisetas</a>
+            <a href="#fotos" class="block py-2 text-light-gray hover:text-gold transition">Fotos</a>
+            <a href="venda.html" class="block mt-4 w-full text-center btn-primary font-bold py-2 px-6 rounded-full">Comprar Agora</a>
+             <a href="login.html" class="block mt-4 w-full text-center border-2 border-gold text-gold font-bold py-2 px-6 rounded-full">Área do Usuário</a>
+        </div>
+    </header>
+
+    <!-- Seção Hero -->
+    <section id="hero" class="min-h-screen flex items-center justify-center text-center bg-dark-blue relative">
+        <div class="relative z-10 p-6" data-aos="fade-up">
+            <h2 class="text-6xl md:text-8xl font-extrabold text-white leading-tight mb-4">
+                UMADEPAR <span class="text-gold">2025</span>
+            </h2>
+            <p class="text-xl md:text-2xl text-light-gray mt-4 mb-8 max-w-3xl mx-auto">
+                Um tempo de renovo, propósito e união para a juventude que serve a Deus no Paraná.
+            </p>
+            <a href="venda.html" class="btn-primary font-bold py-4 px-10 rounded-full text-lg">
+                Garanta sua Camiseta
+            </a>
+        </div>
+    </section>
+
+    <main>
+        <!-- Seção Sobre o Evento -->
+        <section id="sobre" class="py-20 md:py-32 bg-light-gray text-dark-blue">
+            <div class="container mx-auto px-6 text-center">
+                <h3 class="section-title text-dark-blue" data-aos="fade-up">O Evento</h3>
+                <p class="max-w-3xl mx-auto text-lg md:text-xl leading-relaxed mb-12" data-aos="fade-up" data-aos-delay="100">
+                    A UMADEPAR 2025 é o nosso congresso anual, um ponto de encontro para milhares de jovens de todo o estado do Paraná. Serão dias de louvor, adoração, palavra e comunhão, com o objetivo de despertar e fortalecer a Geração Eleita para viver o chamado de Cristo em nosso tempo.
+                </p>
+                <div class="grid md:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h4 class="text-2xl font-bold mb-2 text-gold">Quando?</h4>
+                        <p class="text-lg">15 a 17 de Novembro</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h4 class="text-2xl font-bold mb-2 text-gold">Onde?</h4>
+                        <p class="text-lg">Centro de Eventos de Curitiba, PR</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h4 class="text-2xl font-bold mb-2 text-gold">Preletores</h4>
+                        <p class="text-lg">Nomes a confirmar</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Palavra dos Líderes -->
+        <section id="lideres" class="py-20 md:py-32 bg-dark-blue">
+            <div class="container mx-auto px-6">
+                <h3 class="section-title text-center text-white" data-aos="fade-up">Palavra dos Líderes</h3>
+                <div class="grid md:grid-cols-2 gap-12 mt-12 items-center">
+                    <div data-aos="fade-right">
+                        <img src="https://placehold.co/600x600/d9d9d9/0f2b45?text=Líder+1" alt="Foto do Pastor Presidente" class="rounded-2xl shadow-2xl w-full">
+                    </div>
+                    <div data-aos="fade-left">
+                        <p class="text-2xl font-light italic text-light-gray mb-6">"Nossa oração é que cada jovem saia deste congresso com o coração ardendo e a fé renovada para ser um agente de transformação nesta geração."</p>
+                        <h4 class="text-xl font-bold text-gold">Pr. Perci Fontoura</h4>
+                        <p class="text-light-gray">Presidente da CIEADEP</p>
+                    </div>
+                    <div class="md:col-start-2" data-aos="fade-left">
+                        <img src="https://placehold.co/600x600/d9d9d9/0f2b45?text=Líder+2" alt="Foto do Coordenador da UMADEPAR" class="rounded-2xl shadow-2xl w-full">
+                    </div>
+                    <div class="md:row-start-2" data-aos="fade-right">
+                        <p class="text-2xl font-light italic text-light-gray mb-6">"Estamos preparando um evento inesquecível, com uma estrutura e uma programação que irão impactar a sua vida. Você é nosso convidado especial!"</p>
+                        <h4 class="text-xl font-bold text-gold">Pr. Fulano de Tal</h4>
+                        <p class="text-light-gray">Coordenador Estadual da UMADEPAR</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Mockups das Camisetas -->
+        <section id="camisetas" class="py-20 md:py-32 bg-light-gray text-dark-blue">
+            <div class="container mx-auto px-6">
+                <h3 class="section-title text-center text-dark-blue" data-aos="fade-up">Nossas Camisetas</h3>
+                <p class="max-w-3xl mx-auto text-center text-lg md:text-xl leading-relaxed mb-12" data-aos="fade-up" data-aos-delay="100">
+                    Vista a camisa do nosso congresso! Desenvolvida com um design moderno e tecido de alta qualidade para você levar a mensagem da Geração Eleita por onde for.
+                </p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg text-center" data-aos="zoom-in">
+                        <img src="https://placehold.co/500x500/0f2b45/ffffff?text=Frente" alt="Mockup da camiseta - Frente" class="rounded-lg mb-4">
+                        <h4 class="text-2xl font-bold">Design Frontal</h4>
+                        <p>Logo "Geração Eleita"</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg text-center" data-aos="zoom-in" data-aos-delay="150">
+                        <img src="https://placehold.co/500x500/0f2b45/ffffff?text=Costas" alt="Mockup da camiseta - Costas" class="rounded-lg mb-4">
+                        <h4 class="text-2xl font-bold">Design Traseiro</h4>
+                        <p>Versículo tema do evento</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg text-center md:col-span-2 lg:col-span-1" data-aos="zoom-in" data-aos-delay="300">
+                        <img src="https://placehold.co/500x500/edbe66/0f2b45?text=Detalhe" alt="Detalhe da camiseta" class="rounded-lg mb-4">
+                        <h4 class="text-2xl font-bold">Acabamento Premium</h4>
+                        <p>Tecido 100% algodão</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Ensaio Fotográfico -->
+        <section id="fotos" class="py-20 md:py-32 bg-dark-blue">
+            <div class="container mx-auto px-6">
+                <h3 class="section-title text-center text-white" data-aos="fade-up">Ensaio Fotográfico</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+                    <div class="col-span-2 row-span-2" data-aos="fade-up">
+                        <img src="https://placehold.co/800x800/d9d9d9/0f2b45?text=Modelo+1" alt="Modelo com camiseta" class="rounded-lg shadow-lg w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onclick="openModal(this.src)">
+                    </div>
+                    <div data-aos="fade-up" data-aos-delay="100">
+                        <img src="https://placehold.co/400x400/d9d9d9/0f2b45?text=Modelo+2" alt="Modelo com camiseta" class="rounded-lg shadow-lg w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onclick="openModal(this.src)">
+                    </div>
+                    <div data-aos="fade-up" data-aos-delay="200">
+                        <img src="https://placehold.co/400x400/edbe66/0f2b45?text=Modelo+3" alt="Modelo com camiseta" class="rounded-lg shadow-lg w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onclick="openModal(this.src)">
+                    </div>
+                    <div data-aos="fade-up" data-aos-delay="300">
+                        <img src="https://placehold.co/400x400/edbe66/0f2b45?text=Modelo+4" alt="Modelo com camiseta" class="rounded-lg shadow-lg w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onclick="openModal(this.src)">
+                    </div>
+                    <div data-aos="fade-up" data-aos-delay="400">
+                        <img src="https://placehold.co/400x400/d9d9d9/0f2b45?text=Modelo+5" alt="Modelo com camiseta" class="rounded-lg shadow-lg w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onclick="openModal(this.src)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Adquira Já -->
+        <section id="adquirir" class="py-20 md:py-32 bg-light-gray text-dark-blue">
+            <div class="container mx-auto px-6 text-center" data-aos="fade-up">
+                <h3 class="section-title text-dark-blue">Garanta a Camiseta Oficial</h3>
+                <p class="max-w-3xl mx-auto text-lg md:text-xl leading-relaxed mb-8">
+                    Não fique de fora! Leve a marca do nosso congresso e ajude a espalhar a mensagem. Clique no botão abaixo para ser redirecionado à nossa loja oficial.
+                </p>
+                <a href="venda.html" class="btn-primary font-bold py-4 px-10 rounded-full text-lg inline-block">
+                    Adquirir na Loja
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-dark-blue border-t border-gold/20 py-12">
+        <div class="container mx-auto px-6 text-center text-light-gray">
+            <p class="font-bold text-xl mb-2 text-gold">UMADEPAR 2025</p>
+            <p>&copy; 2025 União da Mocidade da Assembleia de Deus no Estado do Paraná. Todos os direitos reservados.</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="hover:text-gold transition">Facebook</a>
+                <a href="#" class="hover:text-gold transition">Instagram</a>
+                <a href="#" class="hover:text-gold transition">YouTube</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal para Imagens -->
+    <div id="imageModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4" onclick="closeModal()">
+        <div class="relative max-w-4xl max-h-full">
+             <button class="absolute -top-4 -right-4 md:top-0 md:-right-12 text-white text-4xl font-bold">&times;</button>
+            <img id="modalImage" src="" alt="Imagem ampliada" class="rounded-lg shadow-2xl object-contain max-w-full max-h-[90vh]">
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Inicializa a biblioteca de animações
+        AOS.init({
+            duration: 800,
+            once: true,
+        });
+
+        // Lógica do Menu Mobile
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Lógica para fechar o menu mobile ao clicar em um link
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Lógica para mudar o fundo do header ao rolar a página
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('py-2', 'shadow-lg');
+                header.classList.remove('py-4');
+            } else {
+                header.classList.remove('py-2', 'shadow-lg');
+                header.classList.add('py-4');
+            }
+        });
+
+        // Lógica do Modal de Imagem
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        function openModal(src) {
+            modalImage.src = src;
+            imageModal.classList.remove('hidden');
+            imageModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            imageModal.classList.add('hidden');
+            imageModal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Lógica do Dropdown de Perfil
+        const userProfileIcon = document.getElementById('user-profile-icon');
+        const userProfileDropdown = document.getElementById('userProfileDropdown');
+
+        userProfileIcon.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede que o clique se propague para a window
+            userProfileDropdown.classList.toggle('hidden');
+        });
+
+        // Fecha o dropdown se clicar fora dele
+        window.addEventListener('click', (e) => {
+            if (!userProfileDropdown.classList.contains('hidden') && !userProfileDropdown.contains(e.target) && !userProfileIcon.contains(e.target)) {
+                userProfileDropdown.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
