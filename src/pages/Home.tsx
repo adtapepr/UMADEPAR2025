@@ -544,45 +544,45 @@ END:VCALENDAR`;
               </section>
 
               {/* Directors Row 1 */}
-              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full" data-aos="fade-up" data-aos-delay="200">
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 md:gap-8 w-full justify-items-center" data-aos="fade-up" data-aos-delay="200">
                 {/* Profile Card 1 */}
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
                     <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/PAULO%20BONARI.png" alt="Foto do Pr. Paulo Bonari" className="w-full h-full object-cover" />
                   </div>
-                  <div>
-                    <h4 className="text-lg font-bold uppercase text-[#edbe66]">PR. PAULO BONARI</h4>
-                    <p className="text-sm uppercase text-[#d9d9d9]">coordenador cieadep 9ª região</p>
+                  <div className="w-full px-2">
+                    <h4 className="text-base md:text-lg font-bold uppercase text-[#edbe66] leading-tight">PR. PAULO BONARI</h4>
+                    <p className="text-xs md:text-sm uppercase text-[#d9d9d9] leading-tight mt-1">coordenador cieadep 9ª região</p>
                   </div>
                 </div>
                 {/* Profile Card 2 */}
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
                     <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/THIAGO%20FRANCO.png" alt="Foto do Pr. Thiago Franco" className="w-full h-full object-cover" />
                   </div>
-                  <div>
-                    <h4 className="text-lg font-bold uppercase text-[#edbe66]">Pr. Thiago Franco</h4>
-                    <p className="text-sm uppercase text-[#d9d9d9]">vice-coord. cieadep 9ª região</p>
+                  <div className="w-full px-2">
+                    <h4 className="text-base md:text-lg font-bold uppercase text-[#edbe66] leading-tight">Pr. Thiago Franco</h4>
+                    <p className="text-xs md:text-sm uppercase text-[#d9d9d9] leading-tight mt-1">vice-coord. cieadep 9ª região</p>
                   </div>
                 </div>
                 {/* Profile Card 3 */}
-                 <div className="flex flex-col items-center gap-4 text-center">
-                   <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
-                     <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/ANDREY%20MACHADO.png" alt="Foto do PR. Andrey Machado" className="w-full h-full object-cover" />
-                   </div>
-                   <div>
-                     <h4 className="text-lg font-bold uppercase text-[#edbe66]">PR. Andrey Machado</h4>
-                     <p className="text-sm uppercase text-[#d9d9d9]">relator cieadep 9ª região</p>
-                   </div>
-                 </div>
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/ANDREY%20MACHADO.png" alt="Foto do PR. Andrey Machado" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-full px-2">
+                    <h4 className="text-base md:text-lg font-bold uppercase text-[#edbe66] leading-tight">PR. Andrey Machado</h4>
+                    <p className="text-xs md:text-sm uppercase text-[#d9d9d9] leading-tight mt-1">relator cieadep 9ª região</p>
+                  </div>
+                </div>
                 {/* Profile Card 4 */}
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
                     <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/LUCIANO%20CAMARGO.png" alt="Foto do PR. luciano camargo" className="w-full h-full object-cover" />
                   </div>
-                  <div>
-                    <h4 className="text-lg font-bold uppercase text-[#edbe66]">PR. luciano camargo</h4>
-                    <p className="text-sm uppercase text-[#d9d9d9]">tesoureiro cieadep 9ª região</p>
+                  <div className="w-full px-2">
+                    <h4 className="text-base md:text-lg font-bold uppercase text-[#edbe66] leading-tight">PR. luciano camargo</h4>
+                    <p className="text-xs md:text-sm uppercase text-[#d9d9d9] leading-tight mt-1">tesoureiro cieadep 9ª região</p>
                   </div>
                 </div>
               </section>
@@ -610,45 +610,45 @@ END:VCALENDAR`;
               </h2>
 
               {/* Directors Row 2 */}
-              <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full" data-aos="fade-up" data-aos-delay="600">
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8 w-full justify-items-center" data-aos="fade-up" data-aos-delay="600">
                 {/* Profile Card 1 */}
-                <div className="flex flex-col items-center gap-3 text-center">
-                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Paulo Bonari" className="w-full h-auto object-cover rounded-2xl" />
-                  <div>
-                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. Paulo Bonari</h4>
-                    <p className="text-xs uppercase text-[#d9d9d9]">coordenador cieadep 9ª região</p>
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Carlos Israel" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-full px-2">
+                    <h4 className="text-sm md:text-base font-bold uppercase text-[#edbe66] leading-tight">Pr. Carlos Israel</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9] leading-tight mt-1">Líder Setor 1</p>
                   </div>
                 </div>
                 {/* Profile Card 2 */}
-                <div className="flex flex-col items-center gap-3 text-center">
-                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Thiago Franco" className="w-full h-auto object-cover rounded-2xl" />
-                  <div>
-                    <h4 className="text-base font-bold uppercase text-[#edbe66]">Pr. Thiago Franco</h4>
-                    <p className="text-xs uppercase text-[#d9d9d9]">vice-coord. cieadep 9ª região</p>
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Eder Moraes" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-full px-2">
+                    <h4 className="text-sm md:text-base font-bold uppercase text-[#edbe66] leading-tight">Pr. Eder Moraes</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9] leading-tight mt-1">Líder Setor 2</p>
                   </div>
                 </div>
                 {/* Profile Card 3 */}
-                <div className="flex flex-col items-center gap-3 text-center">
-                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. Andrey Machado" className="w-full h-auto object-cover rounded-2xl" />
-                  <div>
-                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. Andrey Machado</h4>
-                    <p className="text-xs uppercase text-[#d9d9d9]">relator cieadep 9ª região</p>
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Ev. Lucas Nathan" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-full px-2">
+                    <h4 className="text-sm md:text-base font-bold uppercase text-[#edbe66] leading-tight">Ev. Lucas Nathan</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9] leading-tight mt-1">LÍDER SETOR 3</p>
                   </div>
                 </div>
                 {/* Profile Card 4 */}
-                <div className="flex flex-col items-center gap-3 text-center">
-                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. luciano camargo" className="w-full h-auto object-cover rounded-2xl" />
-                  <div>
-                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. luciano camargo</h4>
-                    <p className="text-xs uppercase text-[#d9d9d9]">tesoureiro cieadep 9ª região</p>
+                <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
+                  <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pb. Marcos Valter" className="w-full h-full object-cover" />
                   </div>
-                </div>
-                {/* Profile Card 5 */}
-                <div className="flex flex-col items-center gap-3 text-center">
-                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. luciano camargo" className="w-full h-auto object-cover rounded-2xl" />
-                  <div>
-                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. luciano camargo</h4>
-                    <p className="text-xs uppercase text-[#d9d9d9]">tesoureiro cieadep 9ª região</p>
+                  <div className="w-full px-2">
+                    <h4 className="text-sm md:text-base font-bold uppercase text-[#edbe66] leading-tight">Pb. Marcos Valter</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9] leading-tight mt-1">Líder Setor 4</p>
                   </div>
                 </div>
               </section>
