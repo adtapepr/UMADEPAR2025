@@ -610,7 +610,7 @@ END:VCALENDAR`;
               </h2>
 
               {/* Directors Row 2 */}
-              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8 w-full justify-items-center" data-aos="fade-up" data-aos-delay="600">
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-6 md:gap-8 w-full justify-items-center mx-auto max-w-6xl px-4" data-aos="fade-up" data-aos-delay="600">
                 {/* Profile Card 1 */}
                 <div className="flex flex-col items-center gap-3 md:gap-4 text-center max-w-[280px] w-full">
                   <div className="w-full aspect-square max-w-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
