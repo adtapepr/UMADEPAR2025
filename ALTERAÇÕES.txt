@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diretoria 9ª Região</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#0F2B45] text-white">
+
+    <!-- Main Container -->
+    <div class="flex flex-col items-center w-full min-h-screen py-16 px-4 sm:px-8 md:px-16 lg:px-24">
+
+        <!-- Content Wrapper -->
+        <div class="flex flex-col items-center justify-center w-full max-w-6xl gap-16 md:gap-20">
+
+            <!-- Title: DIRETORIA 9ª REGIÃO -->
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-center uppercase tracking-[2px]">
+                Diretoria 9ª Região
+            </h1>
+
+            <!-- President Section -->
+            <section class="flex flex-col lg:flex-row items-center w-full gap-8 md:gap-12">
+                <!-- President's Photo -->
+                <div class="w-full lg:w-1/2">
+                    <img src="https://placehold.co/720x720/E0E8FA/0F2B45?text=Foto" alt="Foto do Pastor Presidente" class="w-full h-auto object-cover rounded-2xl shadow-2xl">
+                </div>
+                <!-- President's Quote and Info -->
+                <div class="flex flex-col justify-center w-full lg:w-1/2 gap-8">
+                    <p class="text-2xl italic font-light text-[#D9D9D9]">
+                        "Nossa oração é que cada jovem saia deste congresso com o coração ardendo e a fé renovada para ser um agente de transformação nesta geração."
+                    </p>
+                    <div>
+                        <h3 class="text-xl font-bold uppercase text-[#EDBE66]">
+                            Pr. Perci Fontoura
+                        </h3>
+                        <p class="text-lg uppercase text-[#D9D9D9]">
+                            Presidente da CIEADEP
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Directors Row 1 -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
+                <!-- Profile Card 1 -->
+                <div class="flex flex-col items-center gap-4 text-center">
+                    <img src="https://placehold.co/362x370/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Paulo Bonari" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-lg font-bold uppercase text-[#EDBE66]">PR. PAULO BONARI</h4>
+                        <p class="text-sm uppercase text-[#D9D9D9]">coordenador cieadep 9ª região</p>
+                    </div>
+                </div>
+                <!-- Profile Card 2 -->
+                <div class="flex flex-col items-center gap-4 text-center">
+                    <img src="https://placehold.co/362x370/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Thiago Franco" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-lg font-bold uppercase text-[#EDBE66]">Pr. Thiago Franco</h4>
+                        <p class="text-sm uppercase text-[#D9D9D9]">vice-coord. cieadep 9ª região</p>
+                    </div>
+                </div>
+                <!-- Profile Card 3 -->
+                <div class="flex flex-col items-center gap-4 text-center">
+                    <img src="https://placehold.co/362x370/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. Andrey Machado" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-lg font-bold uppercase text-[#EDBE66]">PR. Andrey Machado</h4>
+                        <p class="text-sm uppercase text-[#D9D9D9]">relator cieadep 9ª região</p>
+                    </div>
+                </div>
+                <!-- Profile Card 4 -->
+                <div class="flex flex-col items-center gap-4 text-center">
+                    <img src="https://placehold.co/362x370/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. luciano camargo" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-lg font-bold uppercase text-[#EDBE66]">PR. luciano camargo</h4>
+                        <p class="text-sm uppercase text-[#D9D9D9]">tesoureiro cieadep 9ª região</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Title: PALAVRA DOS LÍDERES -->
+            <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-center uppercase tracking-[2px]">
+                Palavra dos líderes
+            </h2>
+
+            <!-- Video Placeholder -->
+            <div class="w-full h-64 md:h-96 lg:h-[600px] bg-white rounded-3xl flex items-center justify-center">
+                 <span class="text-gray-500 text-xl">Vídeo aqui</span>
+            </div>
+
+            <!-- Title: LÍDERES DOS SETORES -->
+            <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-center uppercase tracking-[2px]">
+                líderes dos setores umadepar 9ª Região
+            </h2>
+
+            <!-- Directors Row 2 -->
+             <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full">
+                <!-- Profile Card 1 -->
+                <div class="flex flex-col items-center gap-3 text-center">
+                    <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Paulo Bonari" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-base font-bold uppercase text-[#EDBE66]">PR. Paulo Bonari</h4>
+                        <p class="text-xs uppercase text-[#D9D9D9]">coordenador cieadep 9ª região</p>
+                    </div>
+                </div>
+                <!-- Profile Card 2 -->
+                <div class="flex flex-col items-center gap-3 text-center">
+                     <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Thiago Franco" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-base font-bold uppercase text-[#EDBE66]">Pr. Thiago Franco</h4>
+                        <p class="text-xs uppercase text-[#D9D9D9]">vice-coord. cieadep 9ª região</p>
+                    </div>
+                </div>
+                <!-- Profile Card 3 -->
+                <div class="flex flex-col items-center gap-3 text-center">
+                     <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. Andrey Machado" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-base font-bold uppercase text-[#EDBE66]">PR. Andrey Machado</h4>
+                        <p class="text-xs uppercase text-[#D9D9D9]">relator cieadep 9ª região</p>
+                    </div>
+                </div>
+                <!-- Profile Card 4 -->
+                <div class="flex flex-col items-center gap-3 text-center">
+                     <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. luciano camargo" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-base font-bold uppercase text-[#EDBE66]">PR. luciano camargo</h4>
+                        <p class="text-xs uppercase text-[#D9D9D9]">tesoureiro cieadep 9ª região</p>
+                    </div>
+                </div>
+                <!-- Profile Card 5 -->
+                <div class="flex flex-col items-center gap-3 text-center">
+                    <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. luciano camargo" class="w-full h-auto object-cover rounded-2xl">
+                    <div>
+                        <h4 class="text-base font-bold uppercase text-[#EDBE66]">PR. luciano camargo</h4>
+                        <p class="text-xs uppercase text-[#D9D9D9]">tesoureiro cieadep 9ª região</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+</body>
+</html>

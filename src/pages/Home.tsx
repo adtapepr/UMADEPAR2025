@@ -387,44 +387,272 @@ export default function Home() {
             <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed mb-8 sm:mb-12" data-aos="fade-up" data-aos-delay="100">
               A UMADEPAR 2025 é o nosso congresso anual, um ponto de encontro para milhares de jovens de todo o estado do Paraná. Serão dias de louvor, adoração, palavra e comunhão, com o objetivo de despertar e fortalecer a Geração Eleita para viver o chamado de Cristo em nosso tempo.
             </p>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8" data-aos="fade-up" data-aos-delay="200">
-              <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
-                <h4 className="text-xl sm:text-2xl font-bold mb-2 text-[#edbe66]">Quando?</h4>
-                <p className="text-base sm:text-lg">15 de Dez de 2025</p>
+            
+            {/* Cards de Informações do Evento */}
+            <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+              
+              {/* Card Data e Horário */}
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-l-4 border-[#edbe66]">
+                <div className="flex items-center mb-3">
+                  <svg className="w-6 h-6 text-[#edbe66] mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                  </svg>
+                  <h4 className="text-lg sm:text-xl font-bold text-[#0f2b45]">Data e Horário</h4>
+                </div>
+                <div className="space-y-1 mb-4">
+                  <p className="text-base font-semibold text-[#0f2b45]">1 de Novembro de 2025</p>
+                  <p className="text-sm text-gray-600">Início: 19h00 • Sábado</p>
+                </div>
+                
+                {/* Botões de Agenda */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => {
+                      const startDate = '20251101T190000Z';
+                      const endDate = '20251101T230000Z';
+                      const title = 'UMADEPAR 2025';
+                      const details = 'Congresso anual da UMADEPAR - Geração Eleita';
+                      const location = 'Centro de Eventos de UMUARAMA-PR';
+                      const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+                      window.open(googleUrl, '_blank');
+                    }}
+                    className="flex items-center justify-center gap-1 bg-[#edbe66] text-[#0f2b45] px-3 py-2 rounded-lg hover:bg-[#d4a853] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
+                  >
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                    </svg>
+                    Google
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      const startDate = '20251101T190000';
+                      const endDate = '20251101T230000';
+                      const title = 'UMADEPAR 2025';
+                      const details = 'Congresso anual da UMADEPAR - Geração Eleita';
+                      const location = 'Centro de Eventos de UMUARAMA-PR';
+                      const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//UMADEPAR//UMADEPAR 2025//EN
+BEGIN:VEVENT
+UID:umadepar2025@umadepar.com
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTSTART:${startDate}
+DTEND:${endDate}
+SUMMARY:${title}
+DESCRIPTION:${details}
+LOCATION:${location}
+END:VEVENT
+END:VCALENDAR`;
+                      const blob = new Blob([icsContent], { type: 'text/calendar' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'umadepar2025.ics';
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="flex items-center justify-center gap-1 bg-[#0f2b45] text-white px-3 py-2 rounded-lg hover:bg-[#1a3a5c] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
+                  >
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.75 3A3.25 3.25 0 0121 6.25v11.5A3.25 3.25 0 0117.75 21H6.25A3.25 3.25 0 013 17.75V6.25A3.25 3.25 0 016.25 3h11.5zm1.75 5.5H4.5v9.25c0 .966.784 1.75 1.75 1.75h11.5c.966 0 1.75-.784 1.75-1.75V8.5zm-1.75-4H6.25c-.966 0-1.75.784-1.75 1.75V7h15V6.25c0-.966-.784-1.75-1.75-1.75z"/>
+                    </svg>
+                    Apple
+                  </button>
+                </div>
               </div>
-              <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
-                <h4 className="text-xl sm:text-2xl font-bold mb-2 text-[#edbe66]">Onde?</h4>
-                <p className="text-base sm:text-lg">Centro de Eventos de Curitiba, PR</p>
+
+              {/* Card Localização */}
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-l-4 border-[#edbe66]">
+                <div className="flex items-center mb-3">
+                  <svg className="w-6 h-6 text-[#edbe66] mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <h4 className="text-lg sm:text-xl font-bold text-[#0f2b45]">Localização</h4>
+                </div>
+                <div className="space-y-1 mb-4">
+                  <p className="text-base font-semibold text-[#0f2b45]">Centro de Eventos</p>
+                  <p className="text-sm text-gray-600">UMUARAMA-PR</p>
+                </div>
+                
+                {/* Botões de Navegação */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => {
+                      const address = 'Centro de Eventos de UMUARAMA-PR';
+                      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+                      window.open(mapsUrl, '_blank');
+                    }}
+                    className="flex items-center justify-center gap-1 bg-[#edbe66] text-[#0f2b45] px-3 py-2 rounded-lg hover:bg-[#d4a853] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
+                  >
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    Maps
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      const address = 'Centro de Eventos de UMUARAMA-PR';
+                      const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(address)}`;
+                      window.open(wazeUrl, '_blank');
+                    }}
+                    className="flex items-center justify-center gap-1 bg-[#0f2b45] text-white px-3 py-2 rounded-lg hover:bg-[#1a3a5c] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
+                  >
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Waze
+                  </button>
+                </div>
               </div>
-              <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg sm:col-span-2 md:col-span-1">
-                <h4 className="text-xl sm:text-2xl font-bold mb-2 text-[#edbe66]">Preletores</h4>
-                <p className="text-base sm:text-lg">Nomes a confirmar</p>
-              </div>
+              
             </div>
           </div>
         </section>
 
-        {/* Seção Palavra dos Líderes */}
+        {/* Seção Diretoria e Líderes */}
         <section id="lideres" className="py-12 sm:py-16 md:py-20 lg:py-32 bg-[#0f2b45]">
-          <div className="container mx-auto px-4 sm:px-6">
-            <h3 className="text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase tracking-[1px] sm:tracking-[2px] mb-4 text-center text-white" data-aos="fade-up">Palavra dos Líderes</h3>
-            <div className="grid md:grid-cols-2 gap-8 sm:gap-12 mt-8 sm:mt-12 items-center">
-              <div data-aos="fade-right">
-                <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/Perci.webp" alt="Foto do Pastor Presidente" className="rounded-2xl shadow-2xl w-full" />
+          <div className="flex flex-col items-center w-full min-h-screen py-16 px-4 sm:px-8 md:px-16 lg:px-24">
+            
+            {/* Content Wrapper */}
+            <div className="flex flex-col items-center justify-center w-full max-w-6xl gap-16 md:gap-20">
+
+              {/* Title: DIRETORIA 9ª REGIÃO */}
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center uppercase tracking-[2px] text-white" data-aos="fade-up">DIRETORIA 9ª REGIÃO ECLESIÁSTICA</h1>
+
+              {/* President Section */}
+              <section className="flex flex-col lg:flex-row items-center w-full gap-8 md:gap-12" data-aos="fade-up" data-aos-delay="100">
+                {/* President's Photo */}
+                <div className="w-full lg:w-1/2">
+                  <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/Perci.webp" alt="Foto do Pastor Presidente" className="w-full h-auto object-cover rounded-2xl shadow-2xl" />
+                </div>
+                {/* President's Quote and Info */}
+                <div className="flex flex-col justify-center w-full lg:w-1/2 gap-8">
+                  <p className="text-2xl italic font-light text-[#d9d9d9]">
+                    "Nossa oração é que cada jovem saia deste congresso com o coração ardendo e a fé renovada para ser um agente de transformação nesta geração."
+                  </p>
+                  <div>
+                    <h3 className="text-xl font-bold uppercase text-[#edbe66]">
+                      Pr. Perci Fontoura
+                    </h3>
+                    <p className="text-lg uppercase text-[#d9d9d9]">
+                      Presidente da CIEADEP
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* Directors Row 1 */}
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full" data-aos="fade-up" data-aos-delay="200">
+                {/* Profile Card 1 */}
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/PAULO%20BONARI.png" alt="Foto do Pr. Paulo Bonari" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold uppercase text-[#edbe66]">PR. PAULO BONARI</h4>
+                    <p className="text-sm uppercase text-[#d9d9d9]">coordenador cieadep 9ª região</p>
+                  </div>
+                </div>
+                {/* Profile Card 2 */}
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/THIAGO%20FRANCO.png" alt="Foto do Pr. Thiago Franco" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold uppercase text-[#edbe66]">Pr. Thiago Franco</h4>
+                    <p className="text-sm uppercase text-[#d9d9d9]">vice-coord. cieadep 9ª região</p>
+                  </div>
+                </div>
+                {/* Profile Card 3 */}
+                 <div className="flex flex-col items-center gap-4 text-center">
+                   <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                     <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/ANDREY%20MACHADO.png" alt="Foto do PR. Andrey Machado" className="w-full h-full object-cover" />
+                   </div>
+                   <div>
+                     <h4 className="text-lg font-bold uppercase text-[#edbe66]">PR. Andrey Machado</h4>
+                     <p className="text-sm uppercase text-[#d9d9d9]">relator cieadep 9ª região</p>
+                   </div>
+                 </div>
+                {/* Profile Card 4 */}
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="w-[250px] h-[250px] bg-[#E0E8FA] rounded-2xl relative overflow-hidden">
+                    <img src="https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/LUCIANO%20CAMARGO.png" alt="Foto do PR. luciano camargo" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold uppercase text-[#edbe66]">PR. luciano camargo</h4>
+                    <p className="text-sm uppercase text-[#d9d9d9]">tesoureiro cieadep 9ª região</p>
+                  </div>
+                </div>
+              </section>
+
+              {/* Title: PALAVRA DOS LÍDERES */}
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center uppercase tracking-[2px] text-white" data-aos="fade-up" data-aos-delay="300">
+                Palavra dos líderes
+              </h2>
+
+              {/* YouTube Video */}
+              <div className="w-full h-64 md:h-96 lg:h-[600px] bg-white rounded-3xl overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/7lDdyeLhwec"
+                  title="UMADEPAR 2022 | Pastor Ney Silva | Coordenador Geral"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
               </div>
-              <div data-aos="fade-left">
-                <p className="text-2xl font-light italic text-[#d9d9d9] mb-6">"Nossa oração é que cada jovem saia deste congresso com o coração ardendo e a fé renovada para ser um agente de transformação nesta geração."</p>
-                <h4 className="text-xl font-bold text-[#edbe66]">Pr. Perci Fontoura</h4>
-                <p className="text-[#d9d9d9]">Presidente da CIEADEP</p>
-              </div>
-              <div className="md:col-start-2" data-aos="fade-left">
-                <img src="https://placehold.co/600x600/d9d9d9/0f2b45?text=Líder+2" alt="Foto do Coordenador da UMADEPAR" className="rounded-2xl shadow-2xl w-full" />
-              </div>
-              <div className="md:row-start-2" data-aos="fade-right">
-                <p className="text-2xl font-light italic text-[#d9d9d9] mb-6">"Estamos preparando um evento inesquecível, com uma estrutura e uma programação que irão impactar a sua vida. Você é nosso convidado especial!"</p>
-                <h4 className="text-xl font-bold text-[#edbe66]">Pb. Eliã Camargo</h4>
-                <p className="text-[#d9d9d9]">Coordenador 9ª Região da UMADEPAR</p>
-              </div>
+
+              {/* Title: LÍDERES DOS SETORES */}
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center uppercase tracking-[2px] text-white" data-aos="fade-up" data-aos-delay="500">
+                líderes dos setores umadepar 9ª Região
+              </h2>
+
+              {/* Directors Row 2 */}
+              <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full" data-aos="fade-up" data-aos-delay="600">
+                {/* Profile Card 1 */}
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Paulo Bonari" className="w-full h-auto object-cover rounded-2xl" />
+                  <div>
+                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. Paulo Bonari</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9]">coordenador cieadep 9ª região</p>
+                  </div>
+                </div>
+                {/* Profile Card 2 */}
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do Pr. Thiago Franco" className="w-full h-auto object-cover rounded-2xl" />
+                  <div>
+                    <h4 className="text-base font-bold uppercase text-[#edbe66]">Pr. Thiago Franco</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9]">vice-coord. cieadep 9ª região</p>
+                  </div>
+                </div>
+                {/* Profile Card 3 */}
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. Andrey Machado" className="w-full h-auto object-cover rounded-2xl" />
+                  <div>
+                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. Andrey Machado</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9]">relator cieadep 9ª região</p>
+                  </div>
+                </div>
+                {/* Profile Card 4 */}
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. luciano camargo" className="w-full h-auto object-cover rounded-2xl" />
+                  <div>
+                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. luciano camargo</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9]">tesoureiro cieadep 9ª região</p>
+                  </div>
+                </div>
+                {/* Profile Card 5 */}
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <img src="https://placehold.co/288x294/E0E8FA/0F2B45?text=Foto" alt="Foto do PR. luciano camargo" className="w-full h-auto object-cover rounded-2xl" />
+                  <div>
+                    <h4 className="text-base font-bold uppercase text-[#edbe66]">PR. luciano camargo</h4>
+                    <p className="text-xs uppercase text-[#d9d9d9]">tesoureiro cieadep 9ª região</p>
+                  </div>
+                </div>
+              </section>
+
             </div>
           </div>
         </section>
@@ -561,9 +789,8 @@ export default function Home() {
                       <p className="text-[#0f2b45]/60 font-bold text-xs sm:text-sm">01/10 - 15/10/2025</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[#0f2b45]/70 text-xs sm:text-sm mb-1 sm:mb-2">🚨&nbsp; Encerramento dos pedidos online</p>
-                      <p className="text-[#0f2b45]/70 text-xs sm:text-sm">
-</p>
+                      <p className="text-[#0f2b45]/70 text-xs sm:text-sm mb-1 sm:mb-2">🚨 Encerramento dos pedidos online</p>
+                      <p className="text-[#0f2b45]/70 text-xs sm:text-sm">Última chance para comprar online!</p>
                     </div>
                   </div>
 

@@ -45,28 +45,27 @@ const VendaJovem: React.FC = () => {
   // Sistema de Lotes
   const getCurrentLot = () => {
     const now = new Date();
-    const october31 = new Date(2025, 9, 31); // 31 de outubro de 2025
-    const eventDate = new Date(2025, 11, 15); // 15 de dezembro de 2025
-    const twentyDaysBefore = new Date(eventDate.getTime() - (20 * 24 * 60 * 60 * 1000)); // 20 dias antes
+    const september30 = new Date(2025, 8, 30, 23, 59, 59); // 30 de setembro de 2025 às 23:59:59
+    const october15 = new Date(2025, 9, 15, 23, 59, 59); // 15 de outubro de 2025 às 23:59:59
 
-    if (now <= october31) {
+    if (now <= september30) {
       return {
         number: 1,
         name: '1º Lote - Promoção Especial',
-        price: 1.00,
-        description: 'Válido até 31 de outubro de 2025',
+        price: 40.00,
+        description: 'Válido até 30 de setembro de 2025',
         status: 'active',
         color: 'from-green-500 to-green-600',
         bgColor: 'bg-green-50',
         textColor: 'text-green-700',
         borderColor: 'border-green-200'
       };
-    } else if (now <= twentyDaysBefore) {
+    } else if (now <= october15) {
       return {
         number: 2,
         name: '2º Lote - Últimas Semanas',
-        price: 45.00,
-        description: 'Válido até 25 de novembro de 2025',
+        price: 50.00,
+        description: 'Válido até 15 de outubro de 2025',
         status: 'active',
         color: 'from-yellow-500 to-orange-500',
         bgColor: 'bg-yellow-50',
@@ -77,8 +76,8 @@ const VendaJovem: React.FC = () => {
       return {
         number: 3,
         name: '3º Lote - No Local do Evento',
-        price: 50.00,
-        description: 'Disponível apenas no dia 15 de dezembro de 2025',
+        price: 60.00,
+        description: 'Disponível apenas no dia 01 de novembro de 2025',
         status: 'event-only',
         color: 'from-red-500 to-red-600',
         bgColor: 'bg-red-50',
@@ -94,8 +93,8 @@ const VendaJovem: React.FC = () => {
     {
       number: 1,
       name: '1º Lote - Promoção Especial',
-      price:1.00,
-      description: 'Até 31/10/2025',
+      price: 40.00,
+      description: 'Até 30/09/2025',
       status: currentLot.number === 1 ? 'active' : currentLot.number > 1 ? 'expired' : 'upcoming',
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-50',
@@ -105,8 +104,8 @@ const VendaJovem: React.FC = () => {
     {
       number: 2,
       name: '2º Lote - Últimas Semanas',
-      price: 45.00,
-      description: 'Nov até 25/11/2025',
+      price: 50.00,
+      description: '01/10 até 15/10/2025',
       status: currentLot.number === 2 ? 'active' : currentLot.number > 2 ? 'expired' : 'upcoming',
       color: 'from-yellow-500 to-orange-500',
       bgColor: 'bg-yellow-50',
@@ -116,7 +115,7 @@ const VendaJovem: React.FC = () => {
     {
       number: 3,
       name: '3º Lote - No Local',
-      price: 50.00,
+      price: 60.00,
       description: 'Apenas no dia do evento',
       status: currentLot.number === 3 ? 'active' : 'upcoming',
       color: 'from-red-500 to-red-600',
@@ -534,7 +533,7 @@ const VendaJovem: React.FC = () => {
                           <span className="font-bold">Compra Apenas no Local</span>
                         </div>
                         <p className="text-sm text-red-600 mt-2">
-                           Este lote estará disponível apenas no dia do evento (15 de dezembro de 2025) no local do UMADEPAR 2025.
+                           Este lote estará disponível apenas no dia do evento (01 de novembro de 2025) no local do UMADEPAR 2025.
                          </p>
                       </div>
                       <button
