@@ -650,6 +650,90 @@ export class OrderService {
     }
   }
 
+  static async deleteOrder(orderId: string): Promise<void> {
+    console.log('🗑️ [OrderService] Iniciando exclusão de pedido:', {
+      order_id: orderId,
+      timestamp: new Date().toISOString()
+    });
+
+    try {
+      // Verificar se o usuário está autenticado
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) {
+        console.error('❌ [OrderService] Erro de autenticação:', authError);
+        throw new Error('Erro de autenticação');
+      }
+
+      if (!user) {
+        console.error('❌ [OrderService] Usuário não autenticado');
+        throw new Error('Usuário não autenticado');
+      }
+
+      // Verificar se o pedido pertence ao usuário
+      const { data: order, error: fetchError } = await supabase
+        .from('pedidos')
+        .select('id, user_id, status')
+        .eq('id', orderId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (fetchError) {
+        console.error('❌ [OrderService] Erro ao buscar pedido:', fetchError);
+        throw new Error('Erro ao buscar pedido');
+      }
+
+      if (!order) {
+        console.error('❌ [OrderService] Pedido não encontrado ou não pertence ao usuário');
+        throw new Error('Pedido não encontrado');
+      }
+
+      // Verificar se o pedido pode ser excluído (apenas pedidos pendentes)
+      if (order.status !== 'pendente') {
+        console.error('❌ [OrderService] Tentativa de excluir pedido não pendente:', {
+          order_id: orderId,
+          status: order.status
+        });
+        throw new Error('Apenas pedidos pendentes podem ser excluídos');
+      }
+
+      // Excluir o pedido (CASCADE irá excluir itens e participantes automaticamente)
+      const { error: deleteError } = await supabase
+        .from('pedidos')
+        .delete()
+        .eq('id', orderId)
+        .eq('user_id', user.id);
+
+      if (deleteError) {
+        console.error('❌ [OrderService] Erro ao excluir pedido:', deleteError);
+        throw new Error('Erro ao excluir pedido');
+      }
+
+      console.log('✅ [OrderService] Pedido excluído com sucesso:', {
+        order_id: orderId,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('❌ [OrderService] Erro na exclusão do pedido:', {
+        error: error,
+        message: error instanceof Error ? error.message : 'Erro desconhecido',
+        order_id: orderId,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Capturar erro no Sentry
+      captureError(error as Error, {
+        tags: {
+          operation: 'delete_order',
+          order_id: orderId
+        }
+      });
+      
+      throw error;
+    }
+  }
+
   static async createOrderAndStartPayment(orderData: CreateOrderData): Promise<string> {
     console.log('🚀 [OrderService] Iniciando fluxo completo de pagamento:', {
       tipo_pedido: orderData.tipo_pedido,

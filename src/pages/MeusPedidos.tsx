@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { OrderService, OrderWithDetails } from '../services/orderService';
 import { useAuth } from '../contexts/AuthContext';
-import { Package, CreditCard, Users, Calendar, MapPin, Phone, User, CheckCircle, Clock, XCircle, AlertCircle, X, ArrowLeft } from 'lucide-react';
+import { Package, CreditCard, Users, Calendar, MapPin, Phone, User, CheckCircle, Clock, XCircle, AlertCircle, X, ArrowLeft, Trash2 } from 'lucide-react';
 
 const MeusPedidos: React.FC = () => {
   const { userData } = useAuth();
@@ -11,6 +11,8 @@ const MeusPedidos: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -93,6 +95,33 @@ const MeusPedidos: React.FC = () => {
       default:
         return status;
     }
+  };
+
+  const handleDeleteOrder = async (orderId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita abrir o modal de detalhes
+    
+    if (showDeleteConfirm !== orderId) {
+      setShowDeleteConfirm(orderId);
+      return;
+    }
+
+    setDeletingOrderId(orderId);
+    try {
+      await OrderService.deleteOrder(orderId);
+      // Recarregar a lista de pedidos
+      await loadOrders();
+      setShowDeleteConfirm(null);
+    } catch (error) {
+      console.error('Erro ao excluir pedido:', error);
+      alert('Erro ao excluir pedido. Tente novamente.');
+    } finally {
+      setDeletingOrderId(null);
+    }
+  };
+
+  const handleCancelDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDeleteConfirm(null);
   };
 
   const formatCurrency = (value: number) => {
@@ -225,6 +254,8 @@ const MeusPedidos: React.FC = () => {
                       </div>
                     )}
                   </div>
+
+
                 </div>
               ))}
             </div>
@@ -246,7 +277,7 @@ const MeusPedidos: React.FC = () => {
           {/* Modal de Detalhes do Pedido */}
           {isModalOpen && selectedOrder && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <div className="bg-[#0f2b45] rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="bg-[#0f2b45] rounded-xl p-6 max-w-xl w-full max-h-[80vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-bold text-white">
                     Detalhes do Pedido #{selectedOrder.id.slice(-8).toUpperCase()}
@@ -260,7 +291,7 @@ const MeusPedidos: React.FC = () => {
                 </div>
 
                 {/* Status e Informações Básicas */}
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-4">
                   <div className="flex items-center justify-between">
                     <span className="text-gray-300 font-semibold">Status:</span>
                     <div className="flex items-center space-x-2">
@@ -289,10 +320,23 @@ const MeusPedidos: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Alerta para pedido pendente */}
+                {selectedOrder.status === 'pendente' && selectedOrder.mp_preference_id && (
+                  <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <div className="flex items-center mb-3">
+                      <AlertCircle className="w-5 h-5 text-yellow-500 mr-2" />
+                      <h4 className="font-bold text-yellow-500">Pedido Pendente</h4>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Seu pedido está aguardando pagamento. Clique no botão abaixo para finalizar a compra.
+                    </p>
+                  </div>
+                )}
+
                 {/* Informações de Pagamento */}
                 {selectedOrder.status === 'pago' && (
-                  <div className="border-t border-[#edbe66]/30 pt-6 mb-6">
-                    <h4 className="font-bold text-white mb-4 flex items-center">
+                  <div className="border-t border-[#edbe66]/30 pt-4 mb-4">
+                    <h4 className="font-bold text-white mb-4 flex items-center justify-center">
                       <CreditCard className="w-5 h-5 mr-2 text-[#edbe66]" />
                       Informações de Pagamento
                     </h4>
@@ -344,8 +388,8 @@ const MeusPedidos: React.FC = () => {
 
                 {/* Itens do Pedido */}
                 {selectedOrder.itens && selectedOrder.itens.length > 0 && (
-                  <div className="border-t border-[#edbe66]/30 pt-6 mb-6">
-                    <h4 className="font-bold text-white mb-4">Itens do Pedido</h4>
+                  <div className="border-t border-[#edbe66]/30 pt-4 mb-4">
+                    <h4 className="font-bold text-white mb-4 text-center">Itens do Pedido</h4>
                     <div className="space-y-3">
                       {selectedOrder.itens.map((item, index) => (
                         <div key={index} className="flex justify-between items-center py-2 border-b border-[#edbe66]/10 last:border-b-0">
@@ -364,7 +408,7 @@ const MeusPedidos: React.FC = () => {
 
                 {/* Participantes (apenas para líderes e pedidos em grupo) */}
                 {userData?.tipo === 'lider' && selectedOrder.tipo_pedido === 'grupo' && selectedOrder.participantes && selectedOrder.participantes.length > 0 && (
-                  <div className="border-t border-[#edbe66]/30 pt-6">
+                  <div className="border-t border-[#edbe66]/30 pt-4">
                     <h4 className="font-bold text-white mb-4 flex items-center">
                       <Users className="w-5 h-5 mr-2 text-[#edbe66]" />
                       Participantes ({selectedOrder.participantes.length})
@@ -384,11 +428,89 @@ const MeusPedidos: React.FC = () => {
 
                 {/* Observações */}
                 {selectedOrder.observacoes && (
-                  <div className="border-t border-[#edbe66]/30 pt-6 mt-6">
-                    <h4 className="font-bold text-white mb-2">Observações</h4>
+                  <div className="border-t border-[#edbe66]/30 pt-4 mt-4">
+                    <h4 className="font-bold text-white mb-2 text-center">Observações</h4>
                     <p className="text-gray-300 text-sm bg-white/5 p-3 rounded-lg border border-[#edbe66]/20">
                       {selectedOrder.observacoes}
                     </p>
+                  </div>
+                )}
+
+                {/* Botões de ação no rodapé */}
+                {selectedOrder.status === 'pendente' && selectedOrder.mp_preference_id && (
+                  <div className="border-t border-[#edbe66]/30 pt-4 mt-4 flex justify-center gap-4">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const preference = await OrderService.createPaymentPreference(selectedOrder.id);
+                          const viteEnvironment = import.meta.env.VITE_ENVIRONMENT;
+                          const isProduction = viteEnvironment === 'production';
+                          const paymentUrl = isProduction ? preference.init_point : preference.sandbox_init_point;
+                          
+                          console.log('🔍 [MeusPedidos] Debug Environment Variables:', {
+                            VITE_ENVIRONMENT: viteEnvironment,
+                            is_production: isProduction,
+                            has_init_point: !!preference.init_point,
+                            has_sandbox_init_point: !!preference.sandbox_init_point,
+                            init_point: preference.init_point,
+                            sandbox_init_point: preference.sandbox_init_point,
+                            selected_url: paymentUrl
+                          });
+                          
+                          window.open(paymentUrl, '_blank');
+                        } catch (error) {
+                          console.error('Erro ao gerar link de pagamento:', error);
+                          alert('Erro ao gerar link de pagamento. Tente novamente.');
+                        }
+                      }}
+                      className="inline-flex items-center px-6 py-3 bg-[#edbe66] text-[#0f2b45] font-bold rounded-lg hover:bg-[#edbe66]/90 transition-colors shadow-lg hover:shadow-xl"
+                    >
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Finalizar Pedido
+                    </button>
+                    
+                    {/* Botão de excluir pedido - apenas para pedidos pendentes */}
+                    {selectedOrder.status === 'pendente' && (
+                      showDeleteConfirm === selectedOrder.id ? (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={async () => {
+                              setDeletingOrderId(selectedOrder.id);
+                              try {
+                                await OrderService.deleteOrder(selectedOrder.id);
+                                await loadOrders();
+                                setShowDeleteConfirm(null);
+                                setIsModalOpen(false);
+                              } catch (error) {
+                                console.error('Erro ao excluir pedido:', error);
+                                alert('Erro ao excluir pedido. Tente novamente.');
+                              } finally {
+                                setDeletingOrderId(null);
+                              }
+                            }}
+                            disabled={deletingOrderId === selectedOrder.id}
+                            className="inline-flex items-center px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            {deletingOrderId === selectedOrder.id ? 'Excluindo...' : 'Confirmar'}
+                          </button>
+                          <button
+                            onClick={() => setShowDeleteConfirm(null)}
+                            className="inline-flex items-center px-4 py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg transition-colors"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setShowDeleteConfirm(selectedOrder.id)}
+                          className="inline-flex items-center px-4 py-3 bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10 font-bold rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Excluir Pedido
+                        </button>
+                      )
+                    )}
                   </div>
                 )}
               </div>

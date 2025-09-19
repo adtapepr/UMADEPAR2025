@@ -413,27 +413,7 @@ const Login: React.FC = () => {
             <h2 className="text-3xl font-bold text-center mb-6">Concluir Cadastro</h2>
             <form onSubmit={handleCompleteRegisterSubmit}>
               {/* Foto de Perfil */}
-              <div className="mb-4 text-center">
-                <label className="block font-bold mb-2">Foto de Perfil</label>
-                <label
-                  htmlFor="profile-photo-input"
-                  className="cursor-pointer border-2 border-dashed border-gray-300 p-6 rounded-3xl flex flex-col items-center justify-center transition-all duration-300 hover:border-yellow-400 hover:bg-yellow-50"
-                >
-                  <img
-                    src={photoPreview}
-                    alt="Preview"
-                    className="w-24 h-24 rounded-full object-cover mb-2"
-                  />
-                  <span className="text-sm text-gray-600">Clique para enviar</span>
-                </label>
-                <input
-                  type="file"
-                  id="profile-photo-input"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                />
-              </div>
+
 
               {/* Líder ou Jovem */}
               <div className="mb-4">

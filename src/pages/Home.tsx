@@ -4,6 +4,81 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { useAuth } from '../contexts/AuthContext';
 
+// Componente de Contagem Regressiva
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    const targetDate = new Date('2025-11-01T19:00:00-03:00').getTime();
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        setTimeLeft({ days, hours, minutes, seconds });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+      <div className="bg-[#0f2b45] backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-[#edbe66]/30 shadow-lg">
+        <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#edbe66] mb-2">
+          {timeLeft.days.toString().padStart(2, '0')}
+        </div>
+        <div className="text-sm sm:text-base md:text-lg font-semibold text-white uppercase tracking-wider">
+          Dias
+        </div>
+      </div>
+      
+      <div className="bg-[#0f2b45] backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-[#edbe66]/30 shadow-lg">
+        <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#edbe66] mb-2">
+          {timeLeft.hours.toString().padStart(2, '0')}
+        </div>
+        <div className="text-sm sm:text-base md:text-lg font-semibold text-white uppercase tracking-wider">
+          Horas
+        </div>
+      </div>
+      
+      <div className="bg-[#0f2b45] backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-[#edbe66]/30 shadow-lg">
+        <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#edbe66] mb-2">
+          {timeLeft.minutes.toString().padStart(2, '0')}
+        </div>
+        <div className="text-sm sm:text-base md:text-lg font-semibold text-white uppercase tracking-wider">
+          Minutos
+        </div>
+      </div>
+      
+      <div className="bg-[#0f2b45] backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-[#edbe66]/30 shadow-lg">
+        <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#edbe66] mb-2">
+          {timeLeft.seconds.toString().padStart(2, '0')}
+        </div>
+        <div className="text-sm sm:text-base md:text-lg font-semibold text-white uppercase tracking-wider">
+          Segundos
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -384,129 +459,50 @@ export default function Home() {
         <section id="sobre" className="py-12 sm:py-16 md:py-20 lg:py-32 bg-[#d9d9d9] text-[#0f2b45]">
           <div className="container mx-auto px-4 sm:px-6 text-center">
             <h3 className="text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase tracking-[1px] sm:tracking-[2px] mb-4 text-[#0f2b45]" data-aos="fade-up">O Evento</h3>
-            <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed mb-8 sm:mb-12" data-aos="fade-up" data-aos-delay="100">
-              A UMADEPAR 2025 é o nosso congresso anual, um ponto de encontro para milhares de jovens de todo o estado do Paraná. Serão dias de louvor, adoração, palavra e comunhão, com o objetivo de despertar e fortalecer a Geração Eleita para viver o chamado de Cristo em nosso tempo.
-            </p>
+            <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed mb-8 sm:mb-12" data-aos="fade-up" data-aos-delay="100">A UMADEPAR 9ª Região realiza o seu congresso de jovens em um grande dia de celebração. Será um tempo de louvor, adoração, palavra e comunhão, onde cremos que Deus nos conduzirá a um verdadeiro tempo de glória, marcando esta geração e fortalecendo o chamado de Cristo em nossos dias.</p>
             
             {/* Cards de Informações do Evento */}
-            <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+            <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="200">
               
               {/* Card Data e Horário */}
-              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-l-4 border-[#edbe66]">
-                <div className="flex items-center mb-3">
-                  <svg className="w-6 h-6 text-[#edbe66] mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-white p-4 rounded-2xl text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <svg className="w-5 h-5 text-[#edbe66] mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
                   </svg>
-                  <h4 className="text-lg sm:text-xl font-bold text-[#0f2b45]">Data e Horário</h4>
+                  <h4 className="text-lg font-bold text-[#0f2b45]">Data e Horário</h4>
                 </div>
-                <div className="space-y-1 mb-4">
-                  <p className="text-base font-semibold text-[#0f2b45]">1 de Novembro de 2025</p>
-                  <p className="text-sm text-gray-600">Início: 19h00 • Sábado</p>
-                </div>
-                
-                {/* Botões de Agenda */}
-                <div className="grid grid-cols-2 gap-2">
-                  <button 
-                    onClick={() => {
-                      const startDate = '20251101T190000Z';
-                      const endDate = '20251101T230000Z';
-                      const title = 'UMADEPAR 2025';
-                      const details = 'Congresso anual da UMADEPAR - Geração Eleita';
-                      const location = 'Centro de Eventos de UMUARAMA-PR';
-                      const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
-                      window.open(googleUrl, '_blank');
-                    }}
-                    className="flex items-center justify-center gap-1 bg-[#edbe66] text-[#0f2b45] px-3 py-2 rounded-lg hover:bg-[#d4a853] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-                    </svg>
-                    Google
-                  </button>
-                  
-                  <button 
-                    onClick={() => {
-                      const startDate = '20251101T190000';
-                      const endDate = '20251101T230000';
-                      const title = 'UMADEPAR 2025';
-                      const details = 'Congresso anual da UMADEPAR - Geração Eleita';
-                      const location = 'Centro de Eventos de UMUARAMA-PR';
-                      const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//UMADEPAR//UMADEPAR 2025//EN
-BEGIN:VEVENT
-UID:umadepar2025@umadepar.com
-DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
-DTSTART:${startDate}
-DTEND:${endDate}
-SUMMARY:${title}
-DESCRIPTION:${details}
-LOCATION:${location}
-END:VEVENT
-END:VCALENDAR`;
-                      const blob = new Blob([icsContent], { type: 'text/calendar' });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'umadepar2025.ics';
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    }}
-                    className="flex items-center justify-center gap-1 bg-[#0f2b45] text-white px-3 py-2 rounded-lg hover:bg-[#1a3a5c] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17.75 3A3.25 3.25 0 0121 6.25v11.5A3.25 3.25 0 0117.75 21H6.25A3.25 3.25 0 013 17.75V6.25A3.25 3.25 0 016.25 3h11.5zm1.75 5.5H4.5v9.25c0 .966.784 1.75 1.75 1.75h11.5c.966 0 1.75-.784 1.75-1.75V8.5zm-1.75-4H6.25c-.966 0-1.75.784-1.75 1.75V7h15V6.25c0-.966-.784-1.75-1.75-1.75z"/>
-                    </svg>
-                    Apple
-                  </button>
-                </div>
+                <p className="text-base font-semibold text-[#0f2b45]">1 de Novembro de 2025</p>
+                <p className="text-sm text-gray-600">Sábado • 19h00</p>
               </div>
 
               {/* Card Localização */}
-              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-l-4 border-[#edbe66]">
-                <div className="flex items-center mb-3">
-                  <svg className="w-6 h-6 text-[#edbe66] mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-white p-4 rounded-2xl text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <svg className="w-5 h-5 text-[#edbe66] mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
-                  <h4 className="text-lg sm:text-xl font-bold text-[#0f2b45]">Localização</h4>
+                  <h4 className="text-lg font-bold text-[#0f2b45]">Localização</h4>
                 </div>
-                <div className="space-y-1 mb-4">
-                  <p className="text-base font-semibold text-[#0f2b45]">Centro de Eventos</p>
-                  <p className="text-sm text-gray-600">UMUARAMA-PR</p>
-                </div>
-                
-                {/* Botões de Navegação */}
-                <div className="grid grid-cols-2 gap-2">
-                  <button 
-                    onClick={() => {
-                      const address = 'Centro de Eventos de UMUARAMA-PR';
-                      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-                      window.open(mapsUrl, '_blank');
-                    }}
-                    className="flex items-center justify-center gap-1 bg-[#edbe66] text-[#0f2b45] px-3 py-2 rounded-lg hover:bg-[#d4a853] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                    Maps
-                  </button>
-                  
-                  <button 
-                    onClick={() => {
-                      const address = 'Centro de Eventos de UMUARAMA-PR';
-                      const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(address)}`;
-                      window.open(wazeUrl, '_blank');
-                    }}
-                    className="flex items-center justify-center gap-1 bg-[#0f2b45] text-white px-3 py-2 rounded-lg hover:bg-[#1a3a5c] transition-all duration-300 text-xs font-semibold shadow-md hover:shadow-lg hover:transform hover:-translate-y-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    Waze
-                  </button>
-                </div>
+                <p className="text-base font-semibold text-[#0f2b45]">Centro de Eventos</p>
+                <p className="text-sm text-gray-600">UMUARAMA-PR</p>
               </div>
               
+            </div>
+            
+            {/* Contagem Regressiva */}
+            <div className="mt-12 sm:mt-16" data-aos="fade-up" data-aos-delay="300">
+              <h4 className="text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-[1px] sm:tracking-[2px] mb-8 text-[#0f2b45]">
+                Faltam apenas
+              </h4>
+              
+              <div className="max-w-4xl mx-auto">
+                <CountdownTimer />
+              </div>
+              
+              <p className="text-base sm:text-lg text-[#0f2b45] mt-6 max-w-2xl mx-auto font-medium">
+                Para o maior congresso de jovens da UMADEPAR 9ª Região!
+              </p>
             </div>
           </div>
         </section>

@@ -3,11 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { OrderService } from '../services/orderService';
 import { useSizeSelectionPersistence } from '../hooks/useFormPersistence';
 import { useAuth } from '../contexts/AuthContext';
+import { usePendingOrder } from '../hooks/usePendingOrder';
+import PendingOrderModal from '../components/PendingOrderModal';
 
 const VendaJovem: React.FC = () => {
   // Auth context
   const { user, userData, signOut } = useAuth();
   const navigate = useNavigate();
+  
+  // Hook para verificar pedidos pendentes
+  const { pendingOrder, isLoading: isPendingOrderLoading } = usePendingOrder();
+  const [showPendingOrderModal, setShowPendingOrderModal] = useState(false);
   
   // Persistência de dados do formulário
   const {
@@ -126,9 +132,9 @@ const VendaJovem: React.FC = () => {
   ];
 
   const images = [
-    'https://placehold.co/600x600/0f2b45/ffffff?text=Frente',
-    'https://placehold.co/600x600/0f2b45/ffffff?text=Costas',
-    'https://placehold.co/600x600/edbe66/0f2b45?text=Detalhe'
+    'https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/FRENTE.webp',
+    'https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/COSTAS.webp',
+    'https://bwrgpdlxhudtyewlmscl.supabase.co/storage/v1/object/public/Assets/DETALHE.webp'
   ];
 
   const sizes = ['P', 'M', 'G', 'GG', 'XG', 'XXG', 'E1', 'E2'];
@@ -259,10 +265,26 @@ const VendaJovem: React.FC = () => {
   };
 
   useEffect(() => {
-    if (showSizeGuide || showPaymentModal || showSuccessModal) {
+    if (showSizeGuide || showPaymentModal || showSuccessModal || showPendingOrderModal) {
       openModal();
     }
-  }, [showSizeGuide, showPaymentModal, showSuccessModal]);
+  }, [showSizeGuide, showPaymentModal, showSuccessModal, showPendingOrderModal]);
+
+  // Efeito para mostrar modal de pedido pendente
+  useEffect(() => {
+    if (!isPendingOrderLoading && pendingOrder && user) {
+      setShowPendingOrderModal(true);
+    }
+  }, [pendingOrder, isPendingOrderLoading, user]);
+
+  const handleCreateNewOrder = () => {
+    setShowPendingOrderModal(false);
+    // Continua na página atual para criar novo pedido
+  };
+
+  const handleClosePendingModal = () => {
+    setShowPendingOrderModal(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -645,7 +667,7 @@ const VendaJovem: React.FC = () => {
       {/* Footer */}
       <footer className="bg-[#0f2b45] border-t border-[#edbe66]/20 py-12">
         <div className="container mx-auto px-6 text-center text-gray-300">
-          <p className="font-bold text-xl mb-2 text-[#edbe66]">UMADEPAR 2025</p>
+          <p className="font-bold text-xl mb-2 text-[#edbe66]">UMADEPAR 9ª REGIÃO 2025</p>
           <p>&copy; 2025 União da Mocidade da Assembleia de Deus no Estado do Paraná. Todos os direitos reservados.</p>
         </div>
       </footer>
@@ -774,6 +796,20 @@ const VendaJovem: React.FC = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Pending Order Modal */}
+      {pendingOrder && (
+        <PendingOrderModal
+          isOpen={showPendingOrderModal}
+          onClose={handleClosePendingModal}
+          pendingOrder={pendingOrder}
+          onCreateNew={handleCreateNewOrder}
+          onOrderDeleted={() => {
+            // Recarregar a página ou atualizar o estado para refletir a exclusão
+            window.location.reload();
+          }}
+        />
       )}
     </div>
   );
